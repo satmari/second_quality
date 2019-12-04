@@ -121,7 +121,7 @@ class ModuleController extends Controller {
 
 		$validator = Validator::make($request->all(), [
             'po' => 'required|min:5|max:5',
-            'size' => 'required|min:1|max:3',
+            'size' => 'required|min:1|max:5',
             'qty' => 'required|min:1|max:100'
         ]);
 
