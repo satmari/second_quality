@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 
-class second_quality_log extends Model {
+class second_quality_box extends Model {
 
 	//
 

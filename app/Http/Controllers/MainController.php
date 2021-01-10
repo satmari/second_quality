@@ -36,19 +36,19 @@ class MainController extends Controller {
 	public function index()
 	{
 		//
-		$user = User::find(Auth::id());
+		// $user = User::find(Auth::id());
 
-		if ($user->is('admin')) { 
-		    return Redirect::to('/');
-		}
-		if ($user->is('magacin')) { 
-		    return Redirect::to('/');
-		}
-		if ($user->is('modul')) { 
-			return view('Request.index'); 
-		}
-		// return view('Request.index');
-		return Redirect::to('/');
+		// if ($user->is('admin')) { 
+		//     return Redirect::to('/');
+		// }
+		// if ($user->is('magacin')) { 
+		//     return Redirect::to('/');
+		// }
+		// if ($user->is('modul')) { 
+		// 	return view('Request.index'); 
+		// }
+		// // return view('Request.index');
+		// return Redirect::to('/');
 	}
 
 }

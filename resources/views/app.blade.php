@@ -18,6 +18,7 @@
 	<!-- <link href="{{ asset('/css/jquery.dataTables.min.css') }}" rel='stylesheet' type='text/css'> -->
 	<link href="{{ asset('/css/jquery-ui.min.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/custom.css') }}" rel='stylesheet' type='text/css'>
+	<link href="{{ asset('/css/choosen.css') }}" rel='stylesheet' type='text/css'>
 	
 		
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -37,12 +38,88 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="http://172.27.161.171/second_quality"><b>2nd Quality</b></a>
+				<a class="navbar-brand" href="http://172.27.161.171/second_quality"><b>Second Quality</b></a>
 			</div>
 
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
-					<li><a href="{{ url('/') }}">Home</a></li>
+					<!-- <li><a href="{{ url('/') }}">Home</a></li> -->
+					<li>
+						 <button class="btn btn-default dropdown-toggle" style="margin: 6px 5px !important;" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+								    Tables
+							    <span class="caret"></span>
+						  </button>
+						<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+						<li><a href="{{ url('/table') }}">Table Bag</a></li>
+						<li><a href="{{ url('/table_box') }}">Table Box</a></li>
+						<li><a href="{{ url('/table_shipment') }}">Table Shipment</a></li>
+						<li><a href="http://172.27.161.173/settings/box">Box config (settings)</a></li>
+							
+						</ul>
+					</li>
+
+					@if(Auth::check() && Auth::user()->level() == 3)
+						@if(Auth::user()->name == 'whsu')
+							<li>
+								 <button class="btn btn-default dropdown-toggle" style="margin: 6px 5px !important;" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+										    Print
+									    <span class="caret"></span>
+								  </button>
+								<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    
+								<li><a href="{{ url('/print_bag_su') }}">Print bag barcodes</a></li> 
+								<li><a href="{{ url('/print_weight_label') }}">Print weight</a></li>
+									
+								</ul>
+							</li>
+
+							<li><a href="{{ url('/transfer_to_subotica') }}">Transfer bag from Kik to Su</a></li> 
+							<li><a href="{{ url('/scan_multiple') }}">Scan muliple Bags and add location</a></li>
+							
+						@endif
+						@if(Auth::user()->name == 'whki')
+							<li><a href="{{ url('/print_bag_ki') }}">Print bag barcodes</a></li> 
+						@endif
+					@endif
+
+					@if(Auth::check() && Auth::user()->level() == 2)
+						@if(Auth::user()->name == 'magacin')
+								<li>
+									 <button class="btn btn-default dropdown-toggle" style="margin: 6px 5px !important;" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+											    Print
+										    <span class="caret"></span>
+									  </button>
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+	    
+									<li><a href="{{ url('/print_bag_su') }}">Print bag barcodes</a></li> 
+									<li><a href="{{ url('/print_weight_label') }}">Print weight</a></li>
+									<li><a href="{{ url('/second_q') }}">Print final box labels</a></li>
+										
+									</ul>
+								</li>
+								<li>
+									 <button class="btn btn-default dropdown-toggle" style="margin: 6px 5px !important;" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+											    Functions
+										    <span class="caret"></span>
+									  </button>
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+									<li><a href="{{ url('/transfer_to_subotica') }}">Transfer bag from Kik to Su</a></li>
+										
+									</ul>
+								</li>
+
+								<li><a href="{{ url('/magacin') }}">Bag table</a></li> 
+								<li><a href="{{ url('/magacin_box') }}">Box table</a></li> 
+								<li><a href="{{ url('/magacin_shipment') }}">Shipment table</a></li> 
+		
+						@endif
+						@if(Auth::user()->name == 'audit')
+								<li><a href="{{ url('/transfer_to_subotica') }}">Transfer bag from Kik to Su</a></li> 
+								
+						@endif
+					@endif
 				</ul>
 
 				<ul class="nav navbar-nav navbar-right">
@@ -80,6 +157,7 @@
 	<!--<script src="{{ asset('/js/jspdf.min.js') }}" type="text/javascript" ></script>-->
 	<script src="{{ asset('/js/FileSaver.min.js') }}" type="text/javascript" ></script>
 	<script src="{{ asset('/js/bootstrap-table-export.js') }}" type="text/javascript" ></script>
+	<script src="{{ asset('/js/choosen.js') }}" type="text/javascript" ></script>
 
 
     
@@ -91,11 +169,19 @@ $(function() {
 		autoFocus: true,
 		source: '{{ URL('getpodata')}}'
 	});
-	$('#module').autocomplete({
-		minLength: 1,
+
+	$('#pok').autocomplete({
+		minLength: 3,
 		autoFocus: true,
-		source: '{{ URL('getmoduledata')}}'
+		source: '{{ URL('getpodatak')}}'
 	});
+
+	// $('#module').autocomplete({
+	// 	minLength: 1,
+	// 	autoFocus: true,
+	// 	source: '{{ URL('getmoduledata')}}'
+	// });
+
 	$('#filter').keyup(function () {
 
         var rex = new RegExp($(this).val(), 'i');
@@ -109,6 +195,8 @@ $(function() {
     
 	});
 
+	$(".chosen").chosen();
+
 	$('.table tr').each(function(){
   		
   		//$("td:contains('pending')").addClass('pending');
@@ -121,7 +209,7 @@ $(function() {
   		// 	$(this).index().addClass('tezenis');
   		// }
 	});
-
+	/*
 	$('.to-print').each(function(){
 		var qty = $(this).html();
 		//console.log(qty);
@@ -147,6 +235,7 @@ $(function() {
 			$(this).addClass('back');
 		}
 	});
+*	/
 
 	// Select all
 	/*$("#checkAll").click(function () {
@@ -169,6 +258,7 @@ $(function() {
 	});
 
 	/*checkbox*/
+	/*
     $('.button-checkbox').each(function () {
 
         // Settings
@@ -232,16 +322,10 @@ $(function() {
         }
         init();
     });
-	
+	*/
 
 });
 </script>
-<script type="text/javascript">
-   $.ajaxSetup({
-       headers: {
-           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-       }
-   });
-</script>
+
 </body>
 </html>

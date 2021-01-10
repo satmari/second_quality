@@ -63,32 +63,52 @@ class HomeController extends Controller {
 		Session::set('type', NULL);
 
 		$user = User::find(Auth::id());
+		// dd($user);
 
-		if (Auth::check())	
-		{
-		    // $userId = Auth::user()->id;
-		    $module = Auth::user()->name;
-		    // var_dump($module);
-		}
+		// if (Auth::check())	
+		// {
+		//     // $userId = Auth::user()->id;
+		//     $module = Auth::user()->name;
+		//     // var_dump($module);
+		// }
 
-		if ($user->is('admin')) { 
-		    // var_dump("admin");
-		    return Redirect::to('/admin');
-		}
+		// if ($user->is('admin')) { 
+		//     dd('admin');
+		//     // return Redirect::to('/admin');
+		// }
 
 		if ($user->is('magacin')) { 
-			// var_dump("modul");
+			// dd('magacin');
+			return Redirect::to('/magacin_index');
 			return Redirect::to('/magacin');
 		}
 		
-		if ($user->is('modul')) { 
-			// var_dump("modul");
-			return Redirect::to('/module');
+		if ($user->is('audit')) { 
+			// dd('audit');
+			return Redirect::to('/audit');
 		}
-		
 
-		return view('home');
+		if ($user->is('pogon')) { 
+			// dd('pogon');
+
+			$u = Auth::user()->name;
+
+			if ($u == 'whsu') { 
+				// dd('whsu');
+				return Redirect::to('/whsu');
+			}
+
+			if ($u == 'whki') { 
+				// dd('whki');
+				return Redirect::to('/whki');
+			}	
+			// return Redirect::to('/whki');
+
+		}
+
+		// return view('home');
 		// return Redirect::to('/');
+		dd('Access denied, call IT departmenrt');
 	}
 
 }
