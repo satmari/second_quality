@@ -104,11 +104,17 @@ class HomeController extends Controller {
 			}	
 			// return Redirect::to('/whki');
 
+			if ($u == 'whse') { 
+				// dd('whse');
+				return Redirect::to('/whse');
+			}	
+			// return Redirect::to('/whse');
+
 		}
 
 		// return view('home');
 		// return Redirect::to('/');
-		dd('Access denied, call IT departmenrt');
+		dd('Access denied, user not exist, call IT department');
 	}
 
 }

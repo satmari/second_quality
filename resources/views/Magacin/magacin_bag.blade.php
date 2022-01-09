@@ -13,6 +13,7 @@
 				<a href="{{url('/magacin_bag_wh_stock')}}" class="btn btn-default btn-xs @if (($type == " ") OR ($type == '(WH_STOCK)')) active @endif"  >WH_STOCK</a>
 				<a href="{{url('/magacin_bag_audit_checked')}}" class="btn btn-default btn-xs @if (($type == " ") OR ($type == '(AUDIT_CHECKED)')) active @endif" >AUDIT_CHECKED</a>
                 <a href="{{url('/magacin_bag_in_box')}}" class="btn btn-default btn-xs @if ($type == '(IN_BOX)') active @endif">IN_BOX</a>
+                <a href="{{url('/scan_bag_magacin_info')}}" class="btn btn-success btn-xs ">Scan Bag and show info</a>
                 <a href="{{url('/scan_bag_magacin')}}" class="btn btn-info btn-xs ">Scan single Bag and add location</a>
                 <a href="{{url('/scan_multiple')}}" class="btn btn-info btn-xs ">Scan muliple Bags and add location</a>
                 <a href="{{url('/scan_bag_to_box')}}" class="btn btn-danger btn-xs ">Scan Bag to Box</a>
@@ -57,17 +58,14 @@
                             <th data-sortable="true">Shift</th>
                             <th data-sortable="true">PRO</th>
                             <th data-sortable="true">Approval</th>
-                            <th data-sortable="true">Sku</th>
+                            <th data-sortable="true">SKU</th>
                             <th data-sortable="true">Status</th>
                             <th data-sortable="true">Location</th>
-                            <th data-sortable="true">Original Qty</th>
-                            <th data-sortable="true">Audit Qty</th>
                             <th data-sortable="true">2nd Q</th>
-                            <th data-sortable="true">1nd Q (APP)</th>
-                            <th data-sortable="true">1nd Q (REP)</th>
-                            <th data-sortable="true">1nd Q (CLE)</th>
-                            <th data-sortable="true">Balance</th>
-                            <th data-sortable="true">Coment</th>
+                            <th data-sortable="true">Brand</th>
+                            <th data-sortable="true">SKU 2</th>
+                            <th data-sortable="true">Barcode type</th>
+                                                        
                             <th></th>
                             <th></th>
                             
@@ -86,34 +84,52 @@
                             <td>{{ $line->shift }}</td>
                             <td>{{ $line->pro }}</td>
                             <td>{{ $line->approval }}</td>
-                            <td>{{ $line->sap_sku }}</td>
+                            <td><pre>{{ $line->sap_sku }}</pre></td>
                             <td>{{ $line->status }}</td>
                             <td>{{ $line->location }}</td>
-                            <td>{{ $line->qty }}</td>
-                            <td>{{ $line->qty_audit }}</td>
                             <td>{{ $line->qty_2 }}</td>
-                            <td>{{ $line->qty_1_approved }}</td>
-                            <td>{{ $line->qty_1_repaired }}</td>
-                            <td>{{ $line->qty_1_cleaned }}</td>
-                            <td>{{ $line->balance }}</td>
-                            <td>{{ $line->coment }}</td>
+                            <td>{{ $line->brand }}</td>
+                            <td>{{ $line->sap_sku_2 }}</td>
+                            <td>{{ $line->barcode_type }}</td>
+                            
+                            
                             
                             @if ($type != '(IN_BOX)')
                             <td>
-                                {!! Form::open(['method'=>'POST', 'url'=>'/scan_bag_location' ]) !!}
-                                    {!! Form::hidden('bag', $line->bag, ['class' => 'form-control']) !!}
+                                @if (($line->status == 'WH_STOCK') OR ($line->status == 'AUDIT_CHECKED'))
+                                    {!! Form::open(['method'=>'POST', 'url'=>'/scan_bag_location' ]) !!}
+                                        {!! Form::hidden('bag', $line->bag, ['class' => 'form-control']) !!}
 
-                                    {!! Form::submit('Add Location', ['class' => 'btn btn-info btn-xs center-block ']) !!}
-                                    @include('errors.list')
-                                {!! Form::close() !!}
+                                        {!! Form::submit('Add Location', ['class' => 'btn btn-info btn-xs center-block ']) !!}
+                                        @include('errors.list')
+                                    {!! Form::close() !!}
+                                @else
+                                    {!! Form::open(['method'=>'POST', 'url'=>'/scan_bag_location' ]) !!}
+                                        {!! Form::hidden('bag', $line->bag, ['class' => 'form-control']) !!}
+
+                                        {!! Form::submit('Add Location', ['class' => 'btn btn-info btn-xs center-block disabled']) !!}
+                                        @include('errors.list')
+                                    {!! Form::close() !!}
+                                @endif
                             </td>
                             <td>
-                                {!! Form::open(['method'=>'POST', 'url'=>'/add_bag_to_box' ]) !!}
-                                    {!! Form::hidden('bag', $line->bag, ['class' => 'form-control']) !!}
+                                @if ($line->status == 'WH_STOCK')
+                                    {!! Form::open(['method'=>'POST', 'url'=>'/add_bag_to_box' ]) !!}
+                                        {!! Form::hidden('bag', $line->bag, ['class' => 'form-control']) !!}
 
-                                    {!! Form::submit('Add Bag to Box', ['class' => 'btn btn-danger btn-xs center-block ']) !!}
-                                    @include('errors.list')
-                                {!! Form::close() !!}
+                                        {!! Form::submit('Add Bag to Box', ['class' => 'btn btn-danger btn-xs center-block ']) !!}
+                                        @include('errors.list')
+                                    {!! Form::close() !!}
+                                @else
+                                    {!! Form::open(['method'=>'POST', 'url'=>'/add_bag_to_box' ]) !!}
+                                        {!! Form::hidden('bag', $line->bag, ['class' => 'form-control']) !!}
+
+                                        {!! Form::submit('Add Bag to Box', ['class' => 'btn btn-danger btn-xs center-block disabled']) !!}
+                                        @include('errors.list')
+                                    {!! Form::close() !!}
+
+                                @endif
+
                             </td>
                             @endif
                                 

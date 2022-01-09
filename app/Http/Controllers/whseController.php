@@ -23,7 +23,7 @@ use Auth;
 use Session;
 use Validator;
 
-class whkiController extends Controller {
+class whseController extends Controller {
 
 	// 1.scan_line
 	// 2.scan_bag
@@ -37,12 +37,12 @@ class whkiController extends Controller {
 		// $user = User::find(Auth::id());
 		// Session::set('leader', NULL);
 
-		return Redirect::to('/scan_start_k');
+		return Redirect::to('/scan_start_z');
 	}
 
 	public function scan_start() {
 
-		return view('whki.scan_line');
+		return view('whse.scan_line');
 	}
 
 	public function scan_line(Request $request) {
@@ -53,28 +53,30 @@ class whkiController extends Controller {
 		$line = $input['line'];
 		// dd($line);
 
-		$line_val = DB::connection('sqlsrv2')->select(DB::raw("SELECT [ModNam] as line FROM [172.27.161.221\\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_Modules] WHERE Active = '1' AND ModNam =  '".$line."' "));
+		$line_val = DB::connection('sqlsrv2')->select(DB::raw("SELECT [ModNam] as line FROM [BdkCLZG].[dbo].[CNF_Modules] WHERE Active = '1' AND ModNam =  '".$line."' "));
 		// dd($line_val);
 
-		if ((!isset($line_val[0]->line) AND $line != 'KI-TC' )) {
-			// dd('Not valid line in Kikinda');
-			$msg = 'Not valid line in Kikinda';
-			return view('whki.scan_line', compact('msg'));
+		if (!isset($line_val[0]->line)) {
+			// dd('Not valid line in Senta');
+			$msg = 'Not valid line in Senta';
+			return view('whse.scan_line', compact('msg'));
 		}
 
-		return view('whki.choose_line_shift', compact('line'));
+		$line_shift = '';
+		// return view('whse.choose_line_shift', compact('line'));
+		return view('whse.scan_bag', compact('line', 'line_shift' ));
 	}
 
-	public function choose_line_shift(Request $request) {
-		//
-		// $this->validate($request, ['line'=>'required']);
-		$input = $request->all(); // change use (delete or comment user Requestl; )
-		// dd($input);
-		$line = $input['line'];
-		$line_shift = $input['line_shift'];
+	// public function choose_line_shift(Request $request) {
+	// 	//
+	// 	// $this->validate($request, ['line'=>'required']);
+	// 	$input = $request->all(); // change use (delete or comment user Requestl; )
+	// 	// dd($input);
+	// 	$line = $input['line'];
+	// 	$line_shift = $input['line_shift'];
 		
-		return view('whki.scan_bag', compact('line', 'line_shift' ));
-	}
+	// 	// return view('whse.scan_bag', compact('line', 'line_shift' ));
+	// }
 
 	public function scan_bag(Request $request) {
 		//
@@ -89,13 +91,13 @@ class whkiController extends Controller {
 		// dd($b_check);
 		if (strlen($bag) > 8) {
 			$msg = 'No valid bag barcode: '.$bag.', probably double scan';
-			return view('whsu.scan_bag', compact('line','msg'));
+			return view('whse.scan_bag', compact('line','line_shift','msg'));
 		}
 
-		if ($b_check != 'BK') {
+		if ($b_check != 'BZ') {
 			// dd('No valid bag barcode');
 			$msg = 'No valid bag barcode: '.$bag;
-			return view('whki.scan_bag', compact('line','line_shift','msg'));
+			return view('whse.scan_bag', compact('line','line_shift','msg'));
 		}
 
 		$bag_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM second_quality_bags WHERE bag = '".$bag."' "));
@@ -103,10 +105,10 @@ class whkiController extends Controller {
 		if (isset($bag_exist[0]->id)) {
 			// dd('this bag already exist in table');
 			$msg = 'This bag already exist in table';
-			return view('whki.scan_bag', compact('line','line_shift','msg'));
+			return view('whse.scan_bag', compact('line','line_shift','msg'));
 		}
 
-		return view('whki.choose_bag_type', compact('line','line_shift','bag'));
+		return view('whse.choose_bag_type', compact('line','line_shift','bag'));
 	}
 
 	public function choose_bag_type(Request $request) {	
@@ -120,20 +122,20 @@ class whkiController extends Controller {
 		$bag_type = strtoupper($input['bag_type']);		
 
 		// dd($bag_type);
-		$pros = DB::connection('sqlsrv2')->select(DB::raw("SELECT [POnum] as pro FROM [172.27.161.221\\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_PO] WHERE POClosed is null OR POClosed = '0' ORDER BY POnum"));
+		$pros = DB::connection('sqlsrv2')->select(DB::raw("SELECT [POnum] as pro FROM [BdkCLZG].[dbo].[CNF_PO] WHERE POClosed is null OR POClosed = '0' ORDER BY POnum"));
 		// dd($pros);
 
-		return view('whki.select_pro', compact('line','line_shift','bag', 'bag_type', 'pros'));
+		return view('whse.select_pro', compact('line','line_shift','bag', 'bag_type', 'pros'));
 	}
 
 	public function select_pro(Request $request) {
 		//
 		$input = $request->all(); // change use (delete or comment user Requestl; )
 		// dd($input);
-		$line = $input['line'];		
-		$line_shift = $input['line_shift'];		
-		$bag = $input['bag'];		
-		$bag_type = $input['bag_type'];	
+		$line = $input['line'];
+		$line_shift = $input['line_shift'];
+		$bag = $input['bag'];
+		$bag_type = $input['bag_type'];
 		$pro = $input['proo'];
 		// $proo = $input['proo'];
 		// dd($pro);
@@ -143,16 +145,16 @@ class whkiController extends Controller {
 			s.Variant,
 			st.StyCod,
 			[Approval] as app
-		FROM [172.27.161.221\\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_PO] as p
-		JOIN [172.27.161.221\\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_SKU] as s ON s.INTKEY = p.SKUKEY
-		JOIN [172.27.161.221\\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_STYLE] as st ON st.INTKEY = s.STYKEY
+		FROM [BdkCLZG].[dbo].[CNF_PO] as p
+		JOIN [BdkCLZG].[dbo].[CNF_SKU] as s ON s.INTKEY = p.SKUKEY
+		JOIN [BdkCLZG].[dbo].[CNF_STYLE] as st ON st.INTKEY = s.STYKEY
 		WHERE [POnum] = '".$pro."' "));
 
 		if (!isset($st_info[0]->pro)) {
 			// dd('Pro is not valid or it is closed');
 			$msg = 'Pro/komesa is not valid or it is closed';
-			$pros = DB::connection('sqlsrv2')->select(DB::raw("SELECT [POnum] as pro FROM [172.27.161.221\\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_PO] WHERE POClosed is null OR POClosed = '0' ORDER BY POnum"));
-			return view('whki.select_pro', compact('line','line_shift','bag', 'bag_type', 'pros', 'msg'));
+			$pros = DB::connection('sqlsrv2')->select(DB::raw("SELECT [POnum] as pro FROM [BdkCLZG].[dbo].[CNF_PO] WHERE POClosed is null OR POClosed = '0' ORDER BY POnum"));
+			return view('whse.select_pro', compact('line','line_shift','bag', 'bag_type', 'pros', 'msg'));
 		}
 		else {
 
@@ -182,8 +184,7 @@ class whkiController extends Controller {
 
 		$app = $st_info[0]->app;
 
-		return view('whki.add_qty', compact('line','line_shift','bag', 'bag_type', 'pro', 'sap_sku','app'));
-
+		return view('whse.add_qty', compact('line','line_shift','bag', 'bag_type', 'pro', 'sap_sku','app'));
 	}
 
 	public function confirm(Request $request) {
@@ -199,7 +200,7 @@ class whkiController extends Controller {
 		$app = $input['app'];
 		$qty = (int)$input['qty'];
 
-		$status = "PICKED_IN_KI";
+		$status = "PICKED_IN_SE";
 		$user = User::find(Auth::id())->name;
 		// dd($user);
 
@@ -250,71 +251,14 @@ class whkiController extends Controller {
 		catch (\Illuminate\Database\QueryException $e) {
 			// dd("Problem to save in table second_quality");
 			$msg = 'Problem to save in table second_quality, maybe this bag is already in table';
-			return view('whki.add_qty', compact('line','line_shift','bag', 'bag_type', 'pro', 'sap_sku','app','msg'));
+			return view('whse.add_qty', compact('line','line_shift','bag', 'bag_type', 'pro', 'sap_sku','app','msg'));
 
 		}
 
 		$msgs = 'Bag succesfuly saved';
-		return view('whki.scan_bag', compact('line','line_shift','msgs'));
+		return view('whse.scan_bag', compact('line','line_shift','msgs'));
 
 	}
 
-	public function print_bag_ki() {
-
-		return view('whki.print_bag_ki');
-	}
-
-	public function print_bag_ki_confirm(Request $request) {
-
-		$input = $request->all(); 
-		// dd($input);
-		
-		if ($input['printer_name'] == '' OR $input['from'] == '' OR $input['to'] == '') {
-
-			$msge = 'All fields should be populated';
-			return view('whki.print_bag_ki', compact('msge'));
-		}
-
-		$printer = $input['printer_name'];
-		$from = (int)$input['from'];
-		$to = (int)$input['to'];
-
-		$numberoflabels = $to - $from;
-
-		return view('whki.print_bag_ki_confirm_print', compact('printer','from','to','numberoflabels'));
-	}
-
-	public function print_bag_ki_confirm_print(Request $request) {
-
-		$input = $request->all(); 
-		// dd($input);
-		
-		$printer = $input['printer'];
-
-		// dd($printer);
-		$from = $input['from'];
-		$to = $input['to'];
-
-		for ($i=$from; $i < $to; $i++) { 
-			
-			$num = str_pad($i, 5, 0, STR_PAD_LEFT);
-
-			// var_dump('BS'.$num);
-
-			$box = new bag_label;
-			$box->bag = 'BK'.$num;
-
-			$bag_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM second_quality_bags WHERE bag = '".$box->bag."' "));
-			if (isset($bag_exist[0]->id)) {
-				continue;
-			}
-			
-			$box->printer = $printer;
-			$box->printed = 0;
-			$box->save();
-
-		}
-
-		return Redirect::to('/');
-	}
+	
 }

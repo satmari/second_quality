@@ -13,6 +13,12 @@
 						  {{ $msg }}
 						</div>
 					@endif
+
+					@if(isset($msg_i))
+						<div class="alert alert-success" role="alert">
+						  {{ $msg_i }}
+						</div>
+					@endif
 					
 					{!! Form::open(['method'=>'POST', 'url'=>'/add_bag_to_box']) !!}
 						<input name="_token" type="hidden" value="{!! csrf_token() !!}" />

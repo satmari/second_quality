@@ -54,7 +54,7 @@ class whsuController extends Controller {
 		// dd($line);
 
 		//Lazarevac
-		if ($line != 'LAZAREVAC') {
+		if (($line != 'LAZAREVAC') AND ($line != 'VALJEVO')) {
 
 			$line_val = DB::connection('sqlsrv2')->select(DB::raw("SELECT [ModNam] as line FROM [BdkCLZG].[dbo].[CNF_Modules] WHERE Active = '1' AND ModNam =  '".$line."' "));
 			// dd($line_val);
@@ -81,29 +81,48 @@ class whsuController extends Controller {
 		// dd($bag);
 		$b_check = substr($bag, 0, 2);
 		// dd($b_check);
+		// dd(strlen($bag));
+
+		if (strlen($bag) > 8) {
+			$msg = 'No valid bag barcode: '.$bag.', probably double scan';
+			return view('whsu.scan_bag', compact('line','msg'));
+		}
 
 		//Lazarevac
-		if ($line != 'LAZAREVAC') {
+		if (($line != 'LAZAREVAC') AND ($line != 'VALJEVO')){
 
-			if ($b_check != 'BS') {
+			if ($b_check == 'BS') {
+						
+				$bag_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM second_quality_bags WHERE bag = '".$bag."' "));
+
+				if (isset($bag_exist[0]->id)) {
+					// dd('this bag already exist in table');
+					$msg = 'This bag already exist in table';
+					return view('whsu.scan_bag', compact('line', 'msg'));
+				}
+				return view('whsu.choose_bag_type', compact('line', 'bag'));
+
+			} elseif ($b_check == 'BZ') {
+
+				$bag_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM second_quality_bags WHERE bag = '".$bag."' "));
+
+				if (isset($bag_exist[0]->id)) {
+					// dd('this bag already exist in table');
+					$msg = 'This bag already exist in table';
+					return view('whse.scan_bag', compact('line', 'msg'));
+				}
+				return view('whse.choose_bag_type', compact('line', 'bag'));
+
+			} else {
+
 				// dd('No valid bag barcode');
 				$msg = 'No valid bag barcode: '.$bag;
 				return view('whsu.scan_bag', compact('line','msg'));
 			}
-
-			$bag_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM second_quality_bags WHERE bag = '".$bag."' "));
-
-			if (isset($bag_exist[0]->id)) {
-				// dd('this bag already exist in table');
-				$msg = 'This bag already exist in table';
-				return view('whsu.scan_bag', compact('line', 'msg'));
-			}
-
-			return view('whsu.choose_bag_type', compact('line', 'bag'));
 
 		} else {
 
-			if ($b_check != 'BL') {
+			if (($b_check != 'BL') AND ($b_check != 'BV')) {
 				// dd('No valid bag barcode');
 				$msg = 'No valid bag barcode: '.$bag;
 				return view('whsu.scan_bag', compact('line','msg'));
@@ -116,11 +135,8 @@ class whsuController extends Controller {
 				$msg = 'This bag already exist in table';
 				return view('whsu.scan_bag', compact('line', 'msg'));
 			}
-
 			return view('whsu.choose_bag_type', compact('line', 'bag'));
-
 		}
-		
 	}
 
 	public function choose_bag_type(Request $request) {	
@@ -152,12 +168,12 @@ class whsuController extends Controller {
 
 		//check pro
 		$st_info = DB::connection('sqlsrv2')->select(DB::raw("SELECT [POnum] as pro,
-			s.Variant,
-			st.StyCod,
+			s.[Variant],
+			st.[StyCod],
 			[Approval] as app
 		FROM [BdkCLZG].[dbo].[CNF_PO] as p
-		JOIN [BdkCLZG].[dbo].[CNF_SKU] as s ON s.INTKEY = p.SKUKEY
-		JOIN [BdkCLZG].[dbo].[CNF_STYLE] as st ON st.INTKEY = s.STYKEY
+		JOIN [BdkCLZG].[dbo].[CNF_SKU] as s ON s.[INTKEY] = p.[SKUKEY]
+		JOIN [BdkCLZG].[dbo].[CNF_STYLE] as st ON st.[INTKEY] = s.[STYKEY]
 		WHERE [POnum] = '".$pro."' "));
 
 		if (!isset($st_info[0]->pro)) {
@@ -225,6 +241,13 @@ class whsuController extends Controller {
 		$size = trim(substr($sap_sku, 13, 5));
 		// dd($size);
 
+		$barcode_type = DB::connection('sqlsrv4')->select(DB::raw("SELECT [Serie] FROM [preparation].[dbo].[Barcode Table Quality] WHERE [Item No_] = '".$style."' AND Color = '".$color."' "));
+		if (isset($barcode_type[0])) {
+			$b_type = $barcode_type[0]->Serie;
+		} else {
+			$b_type = '';
+		}
+
 		//Record Header
 		try {
 			$table = new second_quality_bag;
@@ -243,6 +266,8 @@ class whsuController extends Controller {
 			$table->qty = $qty;
 			$table->user = $user;
 			$table->status = $status;
+
+			$table->barcode_type = $b_type;
 
 			$table->save();
 			
@@ -276,12 +301,35 @@ class whsuController extends Controller {
 				$check = substr($bag, 0, 2);
 				// dd($check);
 
-				if (($check == 'BS') OR ($check == 'BK')) {
+				if (($check == 'BS') OR ($check == 'BK') OR ($check == 'BZ')) {
 					
 					$bag_id = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM second_quality_bags WHERE bag = '".$bag."' "));
-					// dd($bag_id[0]->id);
+					// dd($bag_id);
 
-					if (isset($bag_id[0]->id) AND ($bag_id[0]->status == 'PICKED_IN_KI')) {
+					if (!isset($bag_id[0]->id)) {
+						$msge = 'Bag barcode not found in table, or status is different than PICKED_IN_KI or PICKED_IN_SE';
+						return view('whsu.transfer_bag', compact('msge'));
+					}
+					// dd('stop');
+
+					if ($bag_id[0]->status == 'PICKED_IN_KI') {
+						
+						try {	
+							$box = second_quality_bag::findOrFail($bag_id[0]->id);
+							$box->status = 'AUDIT_TO_DO';
+							$box->save();
+							
+						}
+						catch (\Illuminate\Database\QueryException $e) {
+							dd('problem to save');
+							$msge = 'Problem to save: '.$bag;
+							return view('whsu.transfer_bag', compact('msge'));
+						}
+
+						$msgs = 'Succesfuly saved: '.$bag;
+						return view('whsu.transfer_bag', compact('msgs'));
+
+					} elseif ($bag_id[0]->status == 'PICKED_IN_SE') {
 						
 						try {	
 							$box = second_quality_bag::findOrFail($bag_id[0]->id);
@@ -299,9 +347,10 @@ class whsuController extends Controller {
 						return view('whsu.transfer_bag', compact('msgs'));
 
 					} else {
-						$msge = 'Bag barcode not found in table, or status is different than BK0002 ';
+						$msge = 'Bag barcode not found in table, or status is different than PICKED_IN_KI or PICKED_IN_SE';
 						return view('whsu.transfer_bag', compact('msge'));
-					}
+					}	
+					
 
 				} else {
 					$msge = 'Bag barcode is not correct';
@@ -314,7 +363,6 @@ class whsuController extends Controller {
 		} else {
 			// $msge = 'Bag barcode is not correct';
 			return view('whsu.transfer_bag');			
-
 		}
 
 	}

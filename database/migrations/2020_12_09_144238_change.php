@@ -13,7 +13,7 @@ class Change extends Migration {
 	public function up()
 	{
 		//
-		// Schema::table('second_quality_bags', function (Blueprint $table) {
+		Schema::table('second_quality_bags', function (Blueprint $table) {
   //   		// $table->string('shift')->nullable();
 
   //   		$table->string('ean')->nullable();
@@ -31,7 +31,12 @@ class Change extends Migration {
 		// 	$table->integer('pcs_per_polybag_2')->nullable();
 		// 	$table->integer('pcs_per_box_2')->nullable();
 			
-		// });
+			// $table->string('barcode_type')->nullable();
+			// $table->dateTime('bag_exported_date')->nullable();
+
+			// $table->dateTime('bag_in_audit')->nullable();
+			
+		});
 
 	}
 

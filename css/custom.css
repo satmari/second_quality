@@ -105,7 +105,8 @@ table.dataTable tbody td {
     border-color: #333333;
     /*background-color: #eeff8e !important;*/
     color: #A94442 !important;
-    font-size: large;
+    /*font-size: large;*/
+    font-weight: bold;
 }
 .btn-c2 {
     /*b/* border-bottom: 1px solid #326EB7; */
@@ -115,7 +116,8 @@ table.dataTable tbody td {
     border-color: #333333;
     background-color: #f1bcef !important;
     color: #0a1840 !important;
-    font-size: large;
+    /*font-size: large;*/
+    font-weight: bold;
 }
 .btn-c3 {
    /* border-bottom: 1px solid #326EB7; */
@@ -125,7 +127,8 @@ table.dataTable tbody td {
     border-color: #333333;
     /*background-color: #D6E9C6 !important;*/
     color: #468847 !important;
-    font-size: large;
+    /*font-size: large;*/
+    font-weight: bold;
 }
 .h-b {
     background-color: #D6E9C6 !important;
@@ -306,4 +309,9 @@ a:hover, a:active {
     box-shadow: 5px 5px 11px -2px rgba(0,0,0,0.58);
     border: 1px solid #999999;
     color: black;
+}
+.navbar {
+    
+    margin-bottom: 0px !important;
+    
 }

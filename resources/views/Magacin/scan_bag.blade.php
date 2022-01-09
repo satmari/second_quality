@@ -6,7 +6,7 @@
     <div class="row vertical-center-row">
         <div class="text-center col-md-2 col-md-offset-5">
             <div class="panel panel-default">
-				<div class="panel-heading">Scan Bag barcode:</div>
+				<div class="panel-heading">Scan Bag barcode (single bag):</div>
 				<br>
 					@if(isset($msg))
 						<div class="alert alert-danger" role="alert">

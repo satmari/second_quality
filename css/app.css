@@ -1339,8 +1339,8 @@ kbd kbd {
 }
 pre {
   display: block;
-  padding: 9.5px;
-  margin: 0 0 10px;
+  padding: 0px;
+  margin: 0px;
   font-size: 13px;
   line-height: 1.42857143;
   word-break: break-all;
@@ -5505,8 +5505,9 @@ button.close {
   font-size: 12px;
   font-weight: normal;
   line-height: 1.4;
-  opacity: 0;
-  filter: alpha(opacity=0);
+  opacity: 0.1;
+  filter: alpha(opacity=0.1);
+  text-align: left !important;
 }
 .tooltip.in {
   opacity: 0.9;
@@ -5536,6 +5537,9 @@ button.close {
   text-decoration: none;
   background-color: #000000;
   border-radius: 4px;
+  opacity: 0.1;
+  filter: alpha(opacity=0.1);
+  text-align: left !important;
 }
 .tooltip-arrow {
   position: absolute;
@@ -5618,7 +5622,7 @@ button.close {
   border: 1px solid #cccccc;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 6px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
   white-space: normal;
 }
 .popover.top {

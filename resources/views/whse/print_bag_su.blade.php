@@ -6,7 +6,7 @@
     <div class="row vertical-center-row">
         <div class="text-center col-md-2 col-md-offset-5">
             <div class="panel panel-default">
-				<div class="panel-heading">Print Bag barcode for Kikinda</div>
+				<div class="panel-heading">Print Bag barcode for Subotica</div>
 				<!-- <br> -->
 					
 					
@@ -17,11 +17,16 @@
 
 					</div>
 
-					{!! Form::open(['method'=>'POST', 'url'=>'/print_bag_ki_confirm']) !!}
+					{!! Form::open(['method'=>'POST', 'url'=>'/print_bag_su_confirm']) !!}
 						<input name="_token" type="hidden" value="{!! csrf_token() !!}" />
+							<p>Label: </p>
+						<div class="panel-body">
+							{!! Form::select('labels', array('BS'=>'BS','BL'=>'BL','BK'=>'BK','BZ'=>'BZ','BOX'=>'BOX'), null, array('class' => 'form-control')); !!} 
+						</div>
 
 						<div class="panel-body">
-							{!! Form::select('printer_name', array(''=>'','Kikinda'=>'Kikinda','Preparacija Zebra'=>'Preparacija Zebra','Druga klasa ZEBRA'=>'Druga klasa ZEBRA'), null, array('class' => 'form-control')); !!} 
+							<p>Printer:</p>
+							{!! Form::select('printer_name', array(''=>'','Preparacija Zebra'=>'Preparacija Zebra','Magacin'=>'Magacin','Druga klasa ZEBRA' => 'Druga klasa ZEBRA'), null, array('class' => 'form-control')); !!} 
 						</div>
 
 						<div class="panel-body">
@@ -49,7 +54,7 @@
 						{!! Form::submit('Print', ['class' => 'btn  btn-success center-block']) !!}
 						@include('errors.list')
 
-						{!! Form::close() !!}
+					{!! Form::close() !!}
 					<!-- <hr> -->
 					<br>
 

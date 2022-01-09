@@ -59,7 +59,16 @@ class CreateSecondQualityBagsTable extends Migration {
 
 			$table->integer('pcs_per_polybag_2')->nullable();
 			$table->integer('pcs_per_box_2')->nullable();
+		
+			$table->dateTime('bag_in_wh')->nullable(); 
+
+			$table->string('bag_exported')->nullable();
+			$table->dateTime('bag_exported_date')->nullable();
+
+			$table->dateTime('bag_in_audit')->nullable();
 			
+			$table->string('barcode_type')->nullable();
+
 			$table->timestamps();
 		});
 	}
@@ -75,3 +84,4 @@ class CreateSecondQualityBagsTable extends Migration {
 	}
 
 }
+

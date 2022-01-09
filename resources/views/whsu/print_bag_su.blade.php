@@ -21,12 +21,12 @@
 						<input name="_token" type="hidden" value="{!! csrf_token() !!}" />
 							<p>Label: </p>
 						<div class="panel-body">
-							{!! Form::select('labels', array('BS'=>'BS', 'BL'=>'BL', 'BK'=>'BK', 'BOX'=>'BOX'), null, array('class' => 'form-control')); !!} 
+							{!! Form::select('labels', array('BS'=>'BS','BL'=>'BL','BK'=>'BK','BZ'=>'BZ','BV'=>'BV','BOX'=>'BOX'), null, array('class' => 'form-control')); !!} 
 						</div>
 
 						<div class="panel-body">
 							<p>Printer:</p>
-							{!! Form::select('printer_name', array(''=>'','Preparacija Zebra'=>'Preparacija Zebra','Magacin'=>'Magacin'), null, array('class' => 'form-control')); !!} 
+							{!! Form::select('printer_name', array(''=>'','Preparacija Zebra'=>'Preparacija Zebra','Magacin'=>'Magacin','Druga klasa ZEBRA'=>'Druga klasa ZEBRA'), null, array('class' => 'form-control')); !!} 
 						</div>
 
 						<div class="panel-body">
@@ -54,7 +54,7 @@
 						{!! Form::submit('Print', ['class' => 'btn  btn-success center-block']) !!}
 						@include('errors.list')
 
-						{!! Form::close() !!}
+					{!! Form::close() !!}
 					<!-- <hr> -->
 					<br>
 

@@ -24,26 +24,37 @@
 						<!-- <p>Scan Bag barcode:  <span style="color:red;">*</span></p> -->
 							{!! Form::text('bag', null, ['class' => 'form-control',  'autofocus' => 'autofocus']) !!}
 						</div>
-
+						<br>
 						{!! Form::submit('Add to list', ['class' => 'btn  btn-success center-block']) !!}
 
 						@include('errors.list')
 
 					{!! Form::close() !!}
-					
 					<br>
-					@if (isset($bags))
+					<br>
+					
+					@if (isset($bags) AND (!empty($bags)) )
 					<div>
 						
 						<table  class="table">
 							<thead>
 								<th>Transfer scaned bags to <b>"{{ $location }}"</b></th>
-								
+								<th></th>
 							</thead>
 							<tbody>
 							@foreach ($bags as $line)
 							<tr>
-								<td>{{ $line->bag }}</td>
+								<td><big><big>{{ $line->bag }}</big></big></td>
+								<td><span style="color:red">
+									{!! Form::open(['method'=>'POST', 'url'=>'remove_multiple_location_scan']) !!}
+										<input name="_token" type="hidden" value="{!! csrf_token() !!}" />
+										{!! Form::hidden('id', $line->id, ['class' => 'form-control']) !!}
+										{!! Form::hidden('location', $location, ['class' => 'form-control']) !!}
+
+										{!! Form::submit('X', ['class' => 'btn btn-xs btn-danger cen ter-block']) !!}
+										@include('errors.list')
+									{!! Form::close() !!}
+								</span></td>
 								
 							</tr>
 							@endforeach	

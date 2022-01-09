@@ -13,7 +13,7 @@
 
                 <table class="table table-striped table-bordered" id="sort" 
                 data-show-export="true"
-                data-export-types="['excel']"
+                data-export-types="['excel','csv','txt']"
                 >
                 <!--
                 
@@ -40,7 +40,7 @@
                         <tr>
                             <!-- <th data-sortable="true">Id</th> -->
                             <th data-sortable="true">Box</th>
-                            <th data-sortable="true">Stis code</th>
+                            <th data-sortable="true">SKU 2</th>
                             <th data-sortable="true">Approval</th>
                             
                             <th data-sortable="true">Box Location</th>
@@ -60,7 +60,8 @@
                         <tr>
                             {{--<td>{{ $line->id }}</td>--}}
                             <td>{{ $line->box }}</td>
-                            <td>{{ $line->style_2 }}</td>
+                            {{--<td>{{ $line->style_2 }} {{ $line->color_2 }} {{ $line->size_2 }}</td>--}}
+                            <td><pre>{{ $line->sap_sku_2 }}</pre></td>
                             <td>{{ $line->approval }}</td>
                             
                             <td>{{ $line->box_location }}</td>

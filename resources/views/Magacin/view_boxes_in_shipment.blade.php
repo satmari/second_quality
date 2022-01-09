@@ -53,7 +53,7 @@
                         <tr>
                             <!-- <th data-sortable="true">Id</th> -->
                             <th data-sortable="true">Box</th>
-                            <th data-sortable="true">Stis code</th>
+                            <th data-sortable="true">SKU 2</th>
                             <th data-sortable="true">Box qty</th>
                             <th data-sortable="true">Standard Qty</th>
                             <th data-sortable="true">Box status</th>
@@ -72,7 +72,8 @@
                             {{--<td>{{ $line->id }}</td>--}}
                             
                             <td>{{ $line->box }}</td>
-                            <td>{{ $line->style_2 }}</td>
+                             {{--<td>{{ $line->style_2 }} {{ $line->color_2 }} {{ $line->size_2 }}</td>--}}
+                            <td><pre>{{ $line->sap_sku_2  }}</pre></td>
                             <td>{{ $line->box_qty }}</td>
                             <td>{{ $line->box_qty_standard }}</td>
                             <td>{{ $line->box_status }}</td>

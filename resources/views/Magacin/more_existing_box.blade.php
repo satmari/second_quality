@@ -24,6 +24,8 @@
 						<input name="_token" type="hidden" value="{!! csrf_token() !!}" />
 
 						{!! Form::hidden('style_2', $style_2, ['class' => 'form-control']) !!}
+						{!! Form::hidden('color_2', $color_2, ['class' => 'form-control']) !!}
+						{!! Form::hidden('size_2', $size_2, ['class' => 'form-control']) !!}
 						{!! Form::hidden('approval', $approval, ['class' => 'form-control']) !!}
 						{!! Form::hidden('box_qty_standard', $box_qty_standard, ['class' => 'form-control']) !!}
 						{!! Form::hidden('box_qty', $box_qty, ['class' => 'form-control']) !!}
@@ -38,8 +40,10 @@
 						{!! Form::hidden('box', $box, ['class' => 'form-control']) !!}
 
 						<div class="alert alert-info" role="alert">
-							<p>Box <b>{{ $box }}</b> was found with proper Stis code <b>{{ $style_2 }}</b> and approval <b>{{ $approval }}</b>, 
+							<p>Box <b>{{ $box }}</b> was found with proper Stis code <b>{{$style_2}} {{$color_2}} {{$size_2}}</b> and approval <b>{{ $approval }}</b>, 
 							confirm to combine this bag <b>{{$bag}}</b> and box <b>{{$box}}</b> ?</p>  
+							<p>Total qty of FULL box is : {{ $box_qty_standard }}</p>
+							<p>Box location: {{ $box_location }}</p>
 						</div>
 						
 

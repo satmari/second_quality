@@ -51,6 +51,8 @@
                             <!-- <th data-sortable="true">Id</th> -->
                             <th data-sortable="true">Shipment</th>
                             <th data-sortable="true">Approval</th>
+                            <th data-sortable="true">Boxes</th>
+                            <th data-sortable="true">Garments</th>
                             <th data-sortable="true">Shipment Status</th>
                             <th data-sortable="true">Updated at</th>
                             
@@ -72,6 +74,8 @@
                             {{--<td>{{ $line->id }}</td>--}}
                             <td>{{ $line->shipment }}</td>
                             <td>{{ $line->approval }}</td>
+                            <td>{{ $line->no_box }}</td>
+                            <td>{{ $line->no_garments }}</td>
                             <td>{{ $line->shipment_status }}</td>
                             
                             <td>{{ $line->updated_at }}</td>
@@ -94,26 +98,28 @@
                                     @include('errors.list')
                                 {!! Form::close() !!}
                             </td>
-                            <td>
-                                {!! Form::open(['method'=>'POST', 'url'=>'/view_export_shipment' ]) !!}
-                                    {!! Form::hidden('shipment', $line->shipment, ['class' => 'form-control']) !!}
-                                    {!! Form::hidden('approval', $line->approval, ['class' => 'form-control']) !!}
-
-                                    {!! Form::submit('Export for printng final box labels', ['class' => 'btn btn-info btn-xs center-block ']) !!}
-                                    @include('errors.list')
-                                {!! Form::close() !!}
-                            </td>
                              <td>
                                 {!! Form::open(['method'=>'POST', 'url'=>'/print_export_shipment' ]) !!}
                                     {!! Form::hidden('shipment', $line->shipment, ['class' => 'form-control']) !!}
                                     {!! Form::hidden('approval', $line->approval, ['class' => 'form-control']) !!}
 
-                                    {!! Form::submit('Print final box labels', ['class' => 'btn btn-info btn-xs center-block disabled']) !!}
+                                    {!! Form::submit('Print final box labels', ['class' => 'btn btn-warning btn-xs center-block']) !!}
                                     @include('errors.list')
                                 {!! Form::close() !!}
                             </td>
                             <td>
-                                
+                                {!! Form::open(['method'=>'POST', 'url'=>'/select_box_to_shipment' ]) !!}
+                                    {!! Form::hidden('shipment', $line->shipment, ['class' => 'form-control']) !!}
+                                    {!! Form::hidden('approval', $line->approval, ['class' => 'form-control']) !!}
+                                    @if ($type == '(OPEN)') 
+                                        {!! Form::submit('Select box to shipment', ['class' => 'btn btn-success btn-xs center-block ']) !!}
+                                    @else
+                                        {!! Form::submit('Select box to shipment', ['class' => 'btn btn-success btn-xs center-block disabled']) !!}
+                                    @endif
+                                    @include('errors.list')
+                                {!! Form::close() !!}
+                            </td>
+                             <td>
                                 {!! Form::open(['method'=>'POST', 'url'=>'/add_box_to_shipment' ]) !!}
                                     {!! Form::hidden('shipment', $line->shipment, ['class' => 'form-control']) !!}
                                     {!! Form::hidden('approval', $line->approval, ['class' => 'form-control']) !!}
@@ -124,9 +130,7 @@
                                     @endif
                                     @include('errors.list')
                                 {!! Form::close() !!}
-                                
                             </td>
-
                             <td>
                                 {!! Form::open(['method'=>'POST', 'url'=>'/close_shipment' ]) !!}
                                     {!! Form::hidden('id', $line->id, ['class' => 'form-control']) !!}

@@ -81,10 +81,10 @@
                         <tr>
                             {{--<td>{{ $line->id }}</td>--}}
                             <td>{{ $line->bag }}</td>
-                            <td>{{ $line->sap_sku }}</td>
-                            <td>{{ $line->sap_sku_2 }}</td>
-                            <td>{{ $line->sap_sap_sku_2 }}</td>
-
+                            <td><pre>{{ $line->sap_sku }}</pre></td>
+                            <td><pre>{{ $line->sap_sku_2 }}</pre></td>
+                            <td><pre>{{ $line->sap_sap_sku_2 }}</pre></td>
+                            
                             <td>{{ $line->brand }}</td>
                             <td>{{ $line->pro }}</td>
                             <td>{{ $line->approval }}</td>

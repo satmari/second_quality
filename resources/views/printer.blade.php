@@ -14,7 +14,7 @@
 						{!! Form::open(['method'=>'POST', 'url'=>'/printer_set']) !!}
 		
 							<div class="panel-body">
-								{!! Form::select('printer_name', array(''=>'','Krojacnica'=>'Krojacnica','Magacin'=>'Magacin','SBT-WP01'=>'SBT-WP01','SBT-WP02'=>'SBT-WP02','SBT-WP03'=>'SBT-WP03','SBT-WP04'=>'SBT-WP04','SBT-WP05'=>'SBT-WP05','SBT-WP06'=>'SBT-WP06'), null, array('class' => 'form-control')); !!} 
+								{!! Form::select('printer_name', array(''=>'','Krojacnica'=>'Krojacnica','Magacin'=>'Magacin','SBT-WP01'=>'SBT-WP01','SBT-WP02'=>'SBT-WP02','SBT-WP03'=>'SBT-WP03','SBT-WP04'=>'SBT-WP04','SBT-WP05'=>'SBT-WP05','SBT-WP06'=>'SBT-WP06','Druga klasa ZEBRA'=>'Druga klasa ZEBRA'), null, array('class' => 'form-control')); !!} 
 							</div>
 							<br>
 

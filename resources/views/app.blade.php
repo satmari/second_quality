@@ -52,8 +52,11 @@
 						<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 
 						<li><a href="{{ url('/table') }}">Table Bag</a></li>
+						<li><a href="{{ url('/table_by_pro') }}">Search by PRO</a></li>
+
 						<li><a href="{{ url('/table_box') }}">Table Box</a></li>
 						<li><a href="{{ url('/table_shipment') }}">Table Shipment</a></li>
+						<li><a href="{{ url('/table_bag_box_shipment') }}">Table Bag Box Shipment</a></li>
 						<li><a href="http://172.27.161.173/settings/box">Box config (settings)</a></li>
 							
 						</ul>
@@ -74,7 +77,7 @@
 								</ul>
 							</li>
 
-							<li><a href="{{ url('/transfer_to_subotica') }}">Transfer bag from Kik to Su</a></li> 
+							<li><a href="{{ url('/transfer_to_subotica') }}">Transfer bag from (Kik or Se) to Su</a></li> 
 							<li><a href="{{ url('/scan_multiple') }}">Scan muliple Bags and add location</a></li>
 							
 						@endif
@@ -110,13 +113,81 @@
 									</ul>
 								</li>
 
-								<li><a href="{{ url('/magacin') }}">Bag table</a></li> 
-								<li><a href="{{ url('/magacin_box') }}">Box table</a></li> 
-								<li><a href="{{ url('/magacin_shipment') }}">Shipment table</a></li> 
+								<li>
+									 <button class="btn btn-in fo btn-c1 dropdown-toggle" style="margin: 6px 5px !important;" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+											Bag table
+										    <span class="caret"></span>
+									  </button>
+									  
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+									<li><a style='color:green' href="{{ url('/scan_bag_magacin_info') }}">Scan Bag and show info</a></li>
+									<li><a style='color:blue' href="{{ url('/scan_bag_magacin') }}">Scan single Bag and add location</a></li>
+									<li><a style='color:blue' href="{{ url('/scan_multiple') }}">Scan multiple Bags and add location</a></li>
+									<li><a style='color:red' href="{{ url('/scan_bag_to_box') }}">Scan Bag to Box</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('/magacin') }}">Bag table</a></li>
+									<li><a href="{{ url('/magacin_bag_wh_stock') }}">Bag table (WH_STOCK)</a></li>
+									<li><a href="{{ url('/magacin_bag_audit_checked') }}">Bag table (AUDIT_CHECKED)</a></li>
+									<li><a href="{{ url('/magacin_bag_in_box') }}">Bag table (IN_BOX)</a></li>
+									
+									</ul>
+								</li>
+								<!-- <li><a href="{{ url('/magacin') }}">Bag table</a></li>  -->
+
+								<li>
+									 <button class="btn btn-in fo btn-c2 dropdown-toggle" style="margin: 6px 5px !important;" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+											Box table
+										    <span class="caret"></span>
+									  </button>
+									  
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">	
+
+									<li><a style='color:green' href="{{ url('/scan_box_location') }}">Add Location to box</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('/magacin_box') }}">Box table (FILLING)</a></li>
+									<li><a href="{{ url('/magacin_box_closed') }}">Box table (FULL or CLOSED)</a></li>
+									<li><a href="{{ url('/magacin_box_on_shipment') }}">Box table (ON_SHIPMENT)</a></li>
+									<li><a href="{{ url('/magacin_box_shipped') }}">Box table (SHIPPED)</a></li>
+									
+									</ul>
+								</li>
+								<!-- <li><a href="{{ url('/magacin_box') }}">Box table</a></li> -->
+
+								<li>
+									 <button class="btn btn-in fo btn-c3 dropdown-toggle" style="margin: 6px 5px !important;" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+											Shipment table
+										    <span class="caret"></span>
+									  </button>
+									  
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+									<li><a style='color:green' href="{{ url('/add_new_shipment') }}">Create new shipment</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('/magacin_shipment') }}">Shipment table (OPEN)</a></li>
+									<li><a href="{{ url('/magacin_shipment_closed') }}">Shipment table (CLOSED)</a></li>
+										
+									</ul>
+								</li>
+								<!-- <li><a href="{{ url('/magacin_shipment') }}">Shipment table</a></li>  -->
 		
 						@endif
 						@if(Auth::user()->name == 'audit')
-								<li><a href="{{ url('/transfer_to_subotica') }}">Transfer bag from Kik to Su</a></li> 
+
+								<li>
+									 <button class="btn btn-default dropdown-toggle" style="margin: 6px 5px !important;" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+											    Functions
+										    <span class="caret"></span>
+									  </button>
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+
+									<li><a href="{{ url('/transfer_to_subotica') }}">Transfer bag from Kik to Su</a></li>
+										
+									</ul>
+								</li>
+								<li><a href="{{ url('/scan_bag_audit_info') }}">Scan Bag and show info</a></li> 
+								<li><a href="{{ url('/scan_bag') }}">Scan and check Bag</a></li> 
+								
 								
 						@endif
 					@endif
@@ -174,6 +245,12 @@ $(function() {
 		minLength: 3,
 		autoFocus: true,
 		source: '{{ URL('getpodatak')}}'
+	});
+
+	$('#po_all').autocomplete({
+		minLength: 3,
+		autoFocus: true,
+		source: '{{ URL('getpodata_all')}}'
 	});
 
 	// $('#module').autocomplete({

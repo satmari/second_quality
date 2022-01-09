@@ -6,7 +6,7 @@
     <div class="row vertical-center-row">
         <div class="text-center col-md-2 col-md-offset-5">
             <div class="panel panel-default">
-				<div class="panel-heading">Choose correct PRO/KOMESA for <b><big>{{ $bag }}</big></b></div>
+				<div class="panel-heading">Scan <b><big>LOCATION</big></b> barcode to add on box <b><big>{{ $box }}</big></b>:</div>
 				<br>
 					@if(isset($msg))
 						<div class="alert alert-danger" role="alert">
@@ -14,30 +14,25 @@
 						</div>
 					@endif
 					
-					{!! Form::open(['method'=>'POST', 'url'=>'/change_bag_po_confirm']) !!}
+					{!! Form::open(['method'=>'POST', 'url'=>'/scan_box_location_2']) !!}
 						<input name="_token" type="hidden" value="{!! csrf_token() !!}" />
 
-						{!! Form::hidden('bag', $bag, ['class' => 'form-control']) !!}
-						{!! Form::hidden('bag_id', $bag_id, ['class' => 'form-control']) !!}
+						{!! Form::hidden('box', $box, ['class' => 'form-control']) !!}
+						{!! Form::hidden('box_id', $box_id, ['class' => 'form-control']) !!}
 
 						<div class="panel-body">
-							<p>PRO/Komesa:</p>
-							{!! Form::text('proo', null, ['id' => 'po_all', 'class' => 'form-control', 'autofocus' => 'autofocus']) !!}
+						<!-- <p>Scan Bag barcode:  <span style="color:red;">*</span></p> -->
+							{!! Form::text('location', null, ['class' => 'form-control',  'autofocus' => 'autofocus']) !!}
 						</div>
-
-
 						<br>
-						{!! Form::submit('Confirm', ['class' => 'btn  btn-success center-block']) !!}
+						{!! Form::submit('Next', ['class' => 'btn  btn-success center-block']) !!}
 
 						@include('errors.list')
 
 					{!! Form::close() !!}
 					
-					<!-- <hr>					 -->
 					<br>
-					
 				<!-- <hr> -->
-				
 			</div>
 		</div>
 	</div>

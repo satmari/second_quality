@@ -45,7 +45,7 @@
                             <th data-sortable="true">Shift</th>
                             <th data-sortable="true">PRO</th>
                             <th data-sortable="true">Approval</th>
-                            <th data-sortable="true">Sku</th>
+                            <th data-sortable="true">SKU</th>
                             <th data-sortable="true">Status</th>
                             <th data-sortable="true">Location</th>
                             <th data-sortable="true">Original Qty</th>
@@ -56,7 +56,9 @@
                             <th data-sortable="true">1nd Q (CLE)</th>
                             <th data-sortable="true">Balance</th>
                             <th data-sortable="true">Coment</th>
-                            <th data-sortable="true">Updated at</th>
+                            <th data-sortable="true">Bag in WH</th>
+                            <th data-sortable="true">Updated at date</th>
+                            <th data-sortable="true">Updated at time</th>
                             
                             
                             
@@ -74,7 +76,7 @@
                             <td>{{ $line->shift }}</td>
                             <td>{{ $line->pro }}</td>
                             <td>{{ $line->approval }}</td>
-                            <td>{{ $line->sap_sku }}</td>
+                            <td><pre>{{ $line->sap_sku }}</pre></td>
                             <td>{{ $line->status }}</td>
                             <td>{{ $line->location }}</td>
                             <td>{{ $line->qty }}</td>
@@ -85,7 +87,15 @@
                             <td>{{ $line->qty_1_cleaned }}</td>
                             <td>{{ $line->balance }}</td>
                             <td>{{ $line->coment }}</td>
-                            <td>{{ $line->updated_at }}</td>
+                            
+                            @if ($line->bag_in_wh == '')
+                                <td></td>
+                            @else
+                                <td>{{ date('Y-m-d',strtotime($line->bag_in_wh)) }}</td>
+                            @endif
+                            
+                            <td>{{ date('Y-m-d',strtotime($line->updated_at)) }}</td>
+                            <td>{{ date('G:i',strtotime($line->updated_at)) }}</td>
                             
                             
                                 

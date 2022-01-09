@@ -24,6 +24,8 @@
 						<input name="_token" type="hidden" value="{!! csrf_token() !!}" />
 
 						{!! Form::hidden('style_2', $style_2, ['class' => 'form-control']) !!}
+						{!! Form::hidden('color_2', $color_2, ['class' => 'form-control']) !!}
+						{!! Form::hidden('size_2', $size_2, ['class' => 'form-control']) !!}
 						{!! Form::hidden('approval', $approval, ['class' => 'form-control']) !!}
 						{!! Form::hidden('box_qty_standard', $box_qty_standard, ['class' => 'form-control']) !!}
 						{!! Form::hidden('box_qty', $box_qty, ['class' => 'form-control']) !!}

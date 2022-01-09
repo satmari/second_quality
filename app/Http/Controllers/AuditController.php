@@ -27,10 +27,17 @@ class AuditController extends Controller {
 	public function index()
 	{
 		//
+		// dd($data);
+		return view('audit.index');
+	}
+
+	public function audit_table()
+	{
+		//
 		// dd('test');
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM second_quality_bags WHERE status = 'AUDIT_TO_DO' ORDER BY id asc"));
 		// dd($data);
-		return view('audit.index', compact('data'));
+		return view('audit.table', compact('data'));
 	}
 
 	public function scan_bag()
@@ -229,6 +236,7 @@ class AuditController extends Controller {
 		if ($balance == 0) {
 			$box = second_quality_bag::findOrFail($id);
 			$box->status = 'AUDIT_CHECKED';
+			$box->bag_in_audit = date('Y-m-d H:i:s');
 			$box->save();
 			
 		}
@@ -294,7 +302,17 @@ class AuditController extends Controller {
 			FROM [BdkCLZG].[dbo].[CNF_PO] as p
 			JOIN [BdkCLZG].[dbo].[CNF_SKU] as s ON s.INTKEY = p.SKUKEY
 			JOIN [BdkCLZG].[dbo].[CNF_STYLE] as st ON st.INTKEY = s.STYKEY
-			WHERE [POnum] = '".$pro."' "));
+			WHERE [POnum] = '".$pro."' 
+			UNION 
+			SELECT [POnum] as pro,
+				s.Variant,
+				st.StyCod,
+				[Approval] as app
+			FROM [172.27.161.221\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_PO] as p
+			JOIN [172.27.161.221\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_SKU] as s ON s.INTKEY = p.SKUKEY
+			JOIN [172.27.161.221\INTEOSKKA].[BdkCLZKKa].[dbo].[CNF_STYLE] as st ON st.INTKEY = s.STYKEY
+			WHERE [POnum] = '".$pro."' 
+			"));
 
 			if (!isset($st_info[0]->pro)) {
 				// dd('Pro is not valid or it is closed');
@@ -334,13 +352,30 @@ class AuditController extends Controller {
 		// $box->status = '';
 		$box->pro = $pro;
 		$box->approval = $app;
-		// $box->style = $style;
-		// $box->color = $color;
-		// $box->size = $size;
+		$box->style = $style;
+		$box->color = $color;
+		$box->size = $size;
 		$box->sap_sku = $sap_sku;
 		// $box->status = '';
 		$box->save();
 
 		return Redirect::to('/');
+	}
+
+	public function scan_bag_audit_info(Request $request) {
+	
+		return view('audit.scan_bag_info');
+	}
+
+	public function scan_bag_audit_info_post(Request $request) {
+		
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+		$bag = strtoupper($input['bag']);
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM second_quality_bags WHERE bag = '".$bag."' ORDER BY id asc"));
+		// dd($data);
+
+		return view('audit.table', compact('data'));
 	}
 }

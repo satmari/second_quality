@@ -19,6 +19,9 @@ class CreateSecondQualityBoxesTable extends Migration {
 			$table->string('box')->unique();
 
 			$table->string('style_2')->nullable();
+			$table->string('color_2')->nullable();
+			$table->string('size_2')->nullable();
+
 			$table->string('approval')->nullable();
 
 			$table->string('box_status')->nullable();

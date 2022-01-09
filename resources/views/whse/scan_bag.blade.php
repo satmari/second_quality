@@ -6,32 +6,43 @@
     <div class="row vertical-center-row">
         <div class="text-center col-md-2 col-md-offset-5">
             <div class="panel panel-default">
-				<div class="panel-heading">Scan Location (single bag):</div>
+				<div class="panel-heading">2. Scan Bag barcode:</div>
 				<br>
 					@if(isset($msg))
 						<div class="alert alert-danger" role="alert">
 						  {{ $msg }}
 						</div>
 					@endif
+					@if(isset($msgs))
+						<div class="alert alert-success" role="alert">
+						  {{ $msgs }}
+						</div>
+					@endif
 					
-					{!! Form::open(['method'=>'POST', 'url'=>'/scan_confirm_location']) !!}
+					{!! Form::open(['method'=>'POST', 'url'=>'/scan_bag_z']) !!}
 						<input name="_token" type="hidden" value="{!! csrf_token() !!}" />
 
-						{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
-						{!! Form::hidden('bag', $bag, ['class' => 'form-control']) !!}
-						
+						{!! Form::hidden('line', $line, ['class' => 'form-control']) !!}
+						{!! Form::hidden('line_shift', $line_shift, ['class' => 'form-control']) !!}
+
 						<div class="panel-body">
 						<!-- <p>Scan Bag barcode:  <span style="color:red;">*</span></p> -->
-							{!! Form::text('location', null, ['class' => 'form-control',  'autofocus' => 'autofocus']) !!}
+							{!! Form::text('bag', null, ['class' => 'form-control',  'autofocus' => 'autofocus']) !!}
 						</div>
-
+						<br>
 						{!! Form::submit('Continue', ['class' => 'btn  btn-success center-block']) !!}
 
 						@include('errors.list')
 
 					{!! Form::close() !!}
 					
-					
+					<!-- <hr> -->
+					<br>
+					<p><big><b>Info</b></big></p>
+					<p>Line: {{ $line }}</p>
+					<hr>
+					<a href="{{ url('/scan_start_z') }}" class="btn btn-warning btn-x s center-b lock" >Change Line</a>
+					<br>
 					<br>
 				<!-- <hr> -->
 				
