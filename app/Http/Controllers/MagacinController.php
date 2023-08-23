@@ -42,6 +42,84 @@ class MagacinController extends Controller {
 		return view('Magacin.table', compact('data'));
 	}
 
+	public function recheck_table() {
+		
+		$data = DB::connection('sqlsrv')->select(DB::raw("WITH sq AS (SELECT
+		pro
+		,sap_sku
+		,SUM(qty_2) as app_qty
+		/*,status*/
+		FROM [second_quality].[dbo].[second_quality_bags]
+		WHERE status = 'IN_BOX' OR status = 'WH_STOCK'
+		GROUP BY pro, sap_sku/*, status*/)
+
+		,sap_sq AS (SELECT
+			pro,
+			sku,
+			batch,
+			qty FROM [posummary].[dbo].[sap_second_qualities])
+
+		SELECT
+		 CASE WHEN sq.pro IS NULL THEN sap_sq.pro ELSE SUBSTRING(sq.pro,4,9) END as pro
+		,CASE WHEN sq.sap_sku IS NULL THEN sap_sq.sku ELSE sq.sap_sku END as sku
+		,CASE WHEN sap_sq.batch IS NULL THEN '-' ELSE sap_sq.batch END as batch
+		,CASE WHEN sap_sq.qty IS NULL THEN '-' ELSE sap_sq.qty END as sap_qty
+		,CASE WHEN sq.app_qty IS NULL THEN '-' ELSE sq.app_qty END as app_qty
+		,CASE WHEN sq.pro IS NULL THEN 'NOT IN APP' WHEN sap_sq.pro IS NULL THEN 'NOT IN SAP' WHEN sap_sq.qty != sq.app_qty THEN 'DIFFERENCE' ELSE 'MATCH' END as status
+		FROM sq FULL JOIN sap_sq ON SUBSTRING(sq.pro,4,9) = sap_sq.pro"));
+
+		$last_refresh = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 [created_at] FROM [posummary].[dbo].[sap_second_qualities]"));
+		// dd($last_refresh[0]->created_at);
+		$last_refresh = substr($last_refresh[0]->created_at, 0 ,16);
+		// dd($last_refresh);
+
+
+		// dd($data);
+		return view('Magacin.recheck_table', compact('data','last_refresh'));
+	}
+
+	public function recheck_table_sku() {
+		
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+		CASE WHEN LTRIM(RTRIM(a.[sap_sku])) IS NULL THEN LTRIM(RTRIM(a.[sap_sku])) ELSE LTRIM(RTRIM(a.[sap_sku])) END as sku
+		,b.[sap_qty]
+		,SUM(a.[qty_2]) as app_qty
+		FROM [second_quality].[dbo].[second_quality_bags] as a
+		FULL JOIN (SELECT [sku] as sku,SUM([qty]) as sap_qty
+			FROM [posummary].[dbo].[sap_second_qualities]
+			GROUP BY sku ) as b ON RTRIM(LTRIM(a.[sap_sku])) = RTRIM(LTRIM(b.[sku]))
+		WHERE (a.status = 'WH_STOCK' OR a.status = 'IN_BOX')
+		GROUP BY LTRIM(RTRIM(a.[sap_sku])) ,b.[sap_qty]
+		ORDER BY LTRIM(RTRIM(a.[sap_sku])) asc"));
+
+		$last_refresh = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 [created_at] FROM [posummary].[dbo].[sap_second_qualities]"));
+		// dd($last_refresh[0]->created_at);
+		$last_refresh = substr($last_refresh[0]->created_at, 0 ,16);
+		// dd($last_refresh);
+
+		// dd($data);
+		return view('Magacin.recheck_table_sku', compact('data','last_refresh'));
+	}
+
+	public function recheck_table_sku_sap() {
+		
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+      	a.[sku] as sku
+      	,SUM(a.[qty]) as sap_qty
+      	,(SELECT SUM([qty_2])
+		FROM [second_quality].[dbo].[second_quality_bags]
+		WHERE (a.[sku] = [sap_sku]) and ((status = 'IN_BOX') OR (status = 'WH_STOCK')) ) as app_qty
+		FROM [posummary].[dbo].[sap_second_qualities] as a
+		group by a.sku"));
+
+		$last_refresh = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 [created_at] FROM [posummary].[dbo].[sap_second_qualities]"));
+		// dd($last_refresh[0]->created_at);
+		$last_refresh = substr($last_refresh[0]->created_at, 0 ,16);
+		// dd($last_refresh);
+
+		// dd($data);
+		return view('Magacin.recheck_table_sku', compact('data','last_refresh'));
+	}
 
 	public function table_by_pro() {
 		//
@@ -87,8 +165,8 @@ class MagacinController extends Controller {
 			,bag.sap_sku
 			,REPLACE(LEFT(ISNULL(bag.style_2,'')+'____',9), '_', ' ')+ REPLACE(LEFT(ISNULL(bag.color_2,'')+'____',4), '_', ' ')+ REPLACE(LEFT(ISNULL(bag.size_2,'')+	'____',5), '_', ' ') as sap_sku_2
 			,CASE
-					WHEN LEN(bag.style) < 9 THEN REPLACE(LEFT(ISNULL('K'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(right(bag.sap_sku,5))),'')+ '____',5), '_', ' ')
-					ELSE REPLACE(LEFT(ISNULL('X'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(right(bag.sap_sku,5))),'')+ '____',5), '_', ' ')
+					WHEN LEN(bag.style) < 9 THEN REPLACE(LEFT(ISNULL('K'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,14,5))),'')+ '____',5), '_', ' ')
+					ELSE REPLACE(LEFT(ISNULL('X'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,14,5))),'')+ '____',5), '_', ' ')
 				 END as sap_sap_sku_2
 			,bag.brand
 			,bag.pro
@@ -374,7 +452,6 @@ class MagacinController extends Controller {
 			// return view('magacin.scan_bag_to_box', compact('msg'));
 			// return view('magacin.error', compact('msg'));
 		}
-
 		
   		$error = 'Missing: ';
 
@@ -855,9 +932,9 @@ class MagacinController extends Controller {
 		// $sap_sku = "1234567890123456789";
 		$style = trim(substr($sap_sku, 0 , 9));
 		// dd($style);
-		$color = trim(substr($sap_sku, 9 , 4));
+		$color = substr($sap_sku, 9 , 4);
 		// dd($color);
-		$size = trim(substr($sap_sku, 13 , 5));
+		$size = substr($sap_sku, 13 , 5);
 		// dd($size);
 		
 		// Brand + Ean
@@ -1306,7 +1383,8 @@ class MagacinController extends Controller {
 		$box_new->save();
 
 		// Save link BAG and BOX
-		$link_new = new second_quality_link;
+		// $link_new = new second_quality_link;
+		$link_new = second_quality_link::firstOrNew(['bag_box_key' => $bag.'-'.$box]);
 
 		$link_new->bag_id = $bag_id;
 		$link_new->bag = $bag;
@@ -1315,6 +1393,8 @@ class MagacinController extends Controller {
 		$link_new->box_id = $box_new->id;	
 		$link_new->box = $box_new->box;
 		$link_new->box_qty = $box_qty;
+
+		$link_new->bag_box_key = $bag.'-'.$box;
 
 		$link_new->save();
 
@@ -1373,7 +1453,8 @@ class MagacinController extends Controller {
 
 
 		// Save link BAG and BOX
-		$link_new = new second_quality_link;
+		// $link_new = new second_quality_link;
+		$link_new = second_quality_link::firstOrNew(['bag_box_key' => $bag.'-'.$box]);
 
 		$link_new->bag_id = $bag_id;
 		$link_new->bag = $bag;
@@ -1382,6 +1463,8 @@ class MagacinController extends Controller {
 		$link_new->box_id = $box_new->id;	
 		$link_new->box = $box_new->box;
 		$link_new->box_qty = $box_qty;
+
+		$link_new->bag_box_key = $bag.'-'.$box;
 
 		$link_new->save();
 
@@ -1455,7 +1538,8 @@ class MagacinController extends Controller {
 			$box_new->save();
 
 			// Save link BAG and BOX
-			$link_new = new second_quality_link;
+			// $link_new = new second_quality_link;
+			$link_new = second_quality_link::firstOrNew(['bag_box_key' => $bag.'-'.$box]);
 
 			$link_new->bag_id = $bag_id;
 			$link_new->bag = $bag;
@@ -1464,6 +1548,8 @@ class MagacinController extends Controller {
 			$link_new->box_id = $box_new->id;	
 			$link_new->box = $box_new->box;
 			$link_new->box_qty = $box_qty_standard;
+
+			$link_new->bag_box_key = $bag.'-'.$box;
 
 			$link_new->save();
 
@@ -1538,13 +1624,18 @@ class MagacinController extends Controller {
 
 
 		// Save link BAG and BOX
-		$link_new = new second_quality_link;
+		// $link_new = new second_quality_link;
+		$link_new = second_quality_link::firstOrNew(['bag_box_key' => $bag.'-'.$box]);
+
 		$link_new->bag_id = $bag_id;
 		$link_new->bag = $bag;
 		$link_new->bag_qty = $box_qty_standard - $existing_box_qty;
 		$link_new->box_id = $box_new->id;
 		$link_new->box = $box_new->box;
 		$link_new->box_qty = $box_qty_standard - $existing_box_qty;
+
+		$link_new->bag_box_key = $bag.'-'.$box;
+
 		$link_new->save();
 
 		// Update old link BAG and BOX
@@ -1639,8 +1730,8 @@ class MagacinController extends Controller {
 			,bag.sap_sku
 			,REPLACE(LEFT(ISNULL(bag.style_2,'')+'____',9), '_', ' ')+ REPLACE(LEFT(ISNULL(bag.color_2,'')+'____',4), '_', ' ')+ REPLACE(LEFT(ISNULL(bag.size_2,'')+	'____',5), '_', ' ') as sap_sku_2
 			,CASE
-					WHEN LEN(bag.style) < 9 THEN REPLACE(LEFT(ISNULL('K'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(right(bag.sap_sku,5))),'')+ '____',5), '_', ' ')
-					ELSE REPLACE(LEFT(ISNULL('X'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(right(bag.sap_sku,5))),'')+ '____',5), '_', ' ')
+					WHEN LEN(bag.style) < 9 THEN REPLACE(LEFT(ISNULL('K'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,14,5))),'')+ '____',5), '_', ' ')
+					ELSE REPLACE(LEFT(ISNULL('X'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,14,5))),'')+ '____',5), '_', ' ')
 				 END as sap_sap_sku_2
 			,bag.brand
 			,bag.pro
@@ -1722,8 +1813,8 @@ class MagacinController extends Controller {
 			,bag.sap_sku
 			,REPLACE(LEFT(ISNULL(bag.style_2,'')+'____',9), '_', ' ')+ REPLACE(LEFT(ISNULL(bag.color_2,'')+'____',4), '_', ' ')+ REPLACE(LEFT(ISNULL(bag.size_2,'')+	'____',5), '_', ' ') as sap_sku_2
 			,CASE
-					WHEN LEN(bag.style) < 9 THEN REPLACE(LEFT(ISNULL('K'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(right(bag.sap_sku,5))),'')+ '____',5), '_', ' ')
-					ELSE REPLACE(LEFT(ISNULL('X'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(right(bag.sap_sku,5))),'')+ '____',5), '_', ' ')
+					WHEN LEN(bag.style) < 9 THEN REPLACE(LEFT(ISNULL('K'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,14,5))),'')+ '____',5), '_', ' ')
+					ELSE REPLACE(LEFT(ISNULL('X'+RTRIM(LTRIM(left(bag.sap_sku,9))),'')+'____',9), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,10,4))),'')+'____',4), '_', ' ')+REPLACE(LEFT(ISNULL(RTRIM(LTRIM(SUBSTRING(bag.sap_sku,14,5))),'')+ '____',5), '_', ' ')
 				 END as sap_sap_sku_2
 			,bag.brand
 			,bag.pro
@@ -2129,6 +2220,13 @@ class MagacinController extends Controller {
 			SET box_status = 'SHIPPED'
 			WHERE shipment = '".$shipment."'; SELECT TOP 1 id FROM second_quality_boxes "));
 
+		$data1 = DB::connection('sqlsrv')->update(DB::raw("SET NOCOUNT ON; UPDATE [second_quality].[dbo].[second_quality_bags]
+			SET [second_quality].[dbo].[second_quality_bags].[status] = 'IN_BOX_SHIPPED'
+			FROM [second_quality].[dbo].[second_quality_bags] as b
+			RIGHT JOIN [second_quality].[dbo].[second_quality_links] as l ON b.id = l.bag_id
+			JOIN [second_quality].[dbo].[second_quality_boxes] as o ON o.box = l.box
+			WHERE o.box_status = 'SHIPPED' AND o.shipment = '".$shipment."'; SELECT TOP 1 id FROM second_quality_boxes "));
+
 		return Redirect::to('/magacin_shipment');
 	}
 
@@ -2158,8 +2256,8 @@ class MagacinController extends Controller {
 		$input = $request->all();
 		
 		$style = trim(strtoupper($input['style']));
-		$color = trim(strtoupper($input['color']));
-		$size = trim(strtoupper($input['size']));
+		$color = strtoupper($input['color']);
+		$size = strtoupper($input['size']);
 
 		// dd($style);
 
@@ -2276,5 +2374,48 @@ class MagacinController extends Controller {
 		return view('magacin.scan_box_location', compact('msg'));
 	}
 
+	public function update_umesa() {
+		dd('ne radi vise');
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT s.*
+			  ,s.style_2 as s1
+			  ,b.style_2 as style_2
+			  ,s.color_2 as s2
+			  ,b.color_2 as color_2
+			  ,s.size_2 as s3
+			  ,b.size_2 as size_2
+			  ,s.ean_2 as s4
+			  ,b.ean_2 as ean_2 
+			  ,s.col_desc_2 as s5
+			  ,b.col_desc_2 as col_desc_2
+			  ,s.pcs_per_polybag_2 as s6
+			  ,b.pcs_per_polybag_2 as pcs_per_polybag_2
+			  ,s.pcs_per_box_2 as s7
+			  ,b.pcs_per_box_2 as pcs_per_box_2
+			  ,s.barcode_type as test
+			  ,b.barcode_type as barcode_type
+		  FROM [second_quality].[dbo].[second_quality_bags] as s
+		  JOIN [172.27.161.222].[settings].[dbo].[box_settings] as b ON b.[style] = s.[style] COLLATE Latin1_General_CI_AS  and b.[color] = s.[color] COLLATE Latin1_General_CI_AS and b.[size] = s.[size] COLLATE Latin1_General_CI_AS
+		  where (s.style LIKE 'MIP%' OR s.style = 'MODP%') and (s.status = 'AUDIT_TO_DO'  OR s.status = 'WH_STOCK' OR s.status = 'PICKED_IN_KI' OR s.status = 'AUDIT_CHECKED' OR s.status = 'IN_BOX') and s.qty_2 != 0
+		  order by s.created_at asc"));
+				// dd($data);
+
+		foreach ($data as $line) {
+
+			// dd($line->style);
+			$data = DB::connection('sqlsrv')->update(DB::raw("UPDATE [second_quality].[dbo].[second_quality_bags]
+					SET style_2 = '".$line->style_2."' , color_2 = '".$line->color_2."' ,size_2 = '".$line->size_2."' ,ean_2 = '".$line->ean_2."', col_desc_2 = '".$line->col_desc_2."', pcs_per_polybag_2 = '".$line->pcs_per_polybag_2."', pcs_per_box_2 = '".$line->pcs_per_box_2."'
+					WHERE (style = '".$line->style."' AND size = '".$line->size."' AND color = '".$line->color."') and 
+					(style LIKE 'MIP%' OR style = 'MODP%') and 
+					(status = 'AUDIT_TO_DO' OR status = 'WH_STOCK' OR status = 'PICKED_IN_KI' OR status = 'AUDIT_CHECKED' OR status = 'IN_BOX') and 
+					qty_2 != 0
+			"));
+
+		}
+
+
+
+
+
+	}
 	
 }	

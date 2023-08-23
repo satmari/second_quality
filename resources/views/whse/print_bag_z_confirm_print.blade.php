@@ -15,11 +15,10 @@
 					  
 					</div>
 					
-					{!! Form::open(['method'=>'POST', 'url'=>'/print_bag_su_confirm_print']) !!}
+					{!! Form::open(['method'=>'POST', 'url'=>'/print_bag_z_confirm_print']) !!}
 						<input name="_token" type="hidden" value="{!! csrf_token() !!}" />
 
 						{!! Form::hidden('printer', $printer, ['class' => 'form-control']) !!}
-						{!! Form::hidden('labels', $labels, ['class' => 'form-control']) !!}
 						{!! Form::hidden('from', $from, ['class' => 'form-control']) !!}
 						{!! Form::hidden('to', $to, ['class' => 'form-control']) !!}
 						

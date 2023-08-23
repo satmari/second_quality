@@ -56,7 +56,7 @@ class importController extends Controller {
 	                	$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM second_quality_bags WHERE bag = '".$bag."' "));
 	                	// dd($data);
 
-	                	$style = $data[0]->style;
+	                	$style = trim($data[0]->style);
 	                	$color = $data[0]->color;
 	                	$size = $data[0]->size;
 	                	$id = $data[0]->id;
@@ -205,6 +205,39 @@ class importController extends Controller {
 		return redirect('/');
 	}
 
+	public function postImportQty(Request $request) {
+	    $getSheetName = Excel::load(Request::file('file2'))->getSheetNames();
+	    
+	    foreach($getSheetName as $sheetName)
+	    {
+	        //if ($sheetName === 'Product-General-Table')  {
+	    	//selectSheetsByIndex(0)
+	           	//DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+	            //DB::table('users')->truncate();
 	
+	            //Excel::selectSheets($sheetName)->load($request->file('file'), function ($reader)
+	            //Excel::selectSheets($sheetName)->load(Input::file('file'), function ($reader)
+	            //Excel::filter('chunk')->selectSheetsByIndex(0)->load(Request::file('file'))->chunk(50, function ($reader)
+	            Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file2'))->chunk(5000, function ($reader)
+	            
+	            {
+	                $readerarray = $reader->toArray();
+	                //var_dump($readerarray);
+
+	                foreach($readerarray as $row) {
+	                	
+	                	// dd($row);
+	                	$id = $row['id'];
+	                	$qty = ROUND((int)$row['qty'],0);
+
+	                	$bag_new = second_quality_bag::findOrFail($id);
+						$bag_new->qty = $qty;
+						$bag_new->save();
+	                	
+					}
+            	});
+    	}
+		return redirect('/');
+	}
 	
 }

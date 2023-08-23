@@ -26,6 +26,8 @@ class CreateSecondQualityLinksTable extends Migration {
 
 			$table->integer('box_qty')->nullable();
 
+			$table->string('bag_box_key')->unique(); //new
+
 			$table->timestamps();
 		});
 	}

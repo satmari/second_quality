@@ -33,7 +33,7 @@ class whseController extends Controller {
 
 	public function index()	{
 		//
-		// dd('WHki');
+		// dd('whse');
 		// $user = User::find(Auth::id());
 		// Session::set('leader', NULL);
 
@@ -50,7 +50,7 @@ class whseController extends Controller {
 		// $this->validate($request, ['line'=>'required']);
 		$input = $request->all(); // change use (delete or comment user Requestl; )
 		// dd($input);
-		$line = $input['line'];
+		$line = strtoupper($input['line']);
 		// dd($line);
 
 		$line_val = DB::connection('sqlsrv2')->select(DB::raw("SELECT [ModNam] as line FROM [BdkCLZG].[dbo].[CNF_Modules] WHERE Active = '1' AND ModNam =  '".$line."' "));
@@ -118,7 +118,7 @@ class whseController extends Controller {
 		// dd($input);
 		$line = $input['line'];		
 		$line_shift = $input['line_shift'];		
-		$bag = $input['bag'];		
+		$bag = strtoupper($input['bag']);		
 		$bag_type = strtoupper($input['bag_type']);		
 
 		// dd($bag_type);
@@ -200,6 +200,12 @@ class whseController extends Controller {
 		$app = $input['app'];
 		$qty = (int)$input['qty'];
 
+		if ($qty > 200) {
+
+			$msg = 'Qty is greater than 200 pcs in the bag, please add the correct qty if it is mistake, if you really have more qty than 200, set qty 200, and after that send mail to IT in order to correct qty in the database.';
+			return view('whse.add_qty', compact('line', 'line_shift', 'bag', 'bag_type', 'pro', 'sap_sku','app','msg'));
+		}
+
 		$status = "PICKED_IN_SE";
 		$user = User::find(Auth::id())->name;
 		// dd($user);
@@ -226,7 +232,7 @@ class whseController extends Controller {
 		try {
 			$table = new second_quality_bag;
 
-			$table->bag = $bag;
+			$table->bag = strtoupper($bag);
 			$table->pro = $pro;
 			$table->approval = $app;
 			$table->style = $style;
@@ -258,6 +264,65 @@ class whseController extends Controller {
 		$msgs = 'Bag succesfuly saved';
 		return view('whse.scan_bag', compact('line','line_shift','msgs'));
 
+	}
+
+	public function print_bag_z() {
+
+		return view('whse.print_bag_z');
+	}
+
+	public function print_bag_z_confirm(Request $request) {
+
+		$input = $request->all(); 
+		// dd($input);
+		
+		if ($input['printer_name'] == '' OR $input['from'] == '' OR $input['to'] == '') {
+
+			$msge = 'All fields should be populated';
+			return view('whse.print_bag_z', compact('msge'));
+		}
+
+		$printer = $input['printer_name'];
+		$from = (int)$input['from'];
+		$to = (int)$input['to'];
+
+		$numberoflabels = $to - $from;
+
+		return view('whse.print_bag_z_confirm_print', compact('printer','from','to','numberoflabels'));
+	}
+
+	public function print_bag_z_confirm_print(Request $request) {
+
+		$input = $request->all(); 
+		// dd($input);
+		
+		$printer = $input['printer'];
+
+		// dd($printer);
+		$from = $input['from'];
+		$to = $input['to'];
+
+		for ($i=$from; $i < $to; $i++) { 
+			
+			$num = str_pad($i, 5, 0, STR_PAD_LEFT);
+
+			// var_dump('BS'.$num);
+
+			$box = new bag_label;
+			$box->bag = 'BZ'.$num;
+
+			$bag_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM second_quality_bags WHERE bag = '".$box->bag."' "));
+			if (isset($bag_exist[0]->id)) {
+				continue;
+			}
+			
+			$box->printer = $printer;
+			$box->printed = 0;
+			$box->save();
+
+		}
+
+		return Redirect::to('/');
 	}
 
 	

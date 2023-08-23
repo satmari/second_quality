@@ -50,7 +50,7 @@ class whsuController extends Controller {
 		// $this->validate($request, ['line'=>'required']);
 		$input = $request->all(); // change use (delete or comment user Requestl; )
 		// dd($input);
-		$line = $input['line'];
+		$line = strtoupper($input['line']);
 		// dd($line);
 
 		//Lazarevac
@@ -218,13 +218,22 @@ class whsuController extends Controller {
 		//
 		$input = $request->all(); // change use (delete or comment user Requestl; )
 		// dd($input);
+
+
 		$line = $input['line'];		
 		$bag = $input['bag'];		
 		$bag_type = $input['bag_type'];	
 		$pro = $input['pro'];
 		$sap_sku = $input['sap_sku'];
 		$app = $input['app'];
+
 		$qty = (int)$input['qty'];
+
+		if ($qty > 200) {
+
+			$msg = 'Qty is greater than 200 pcs in the bag, please add the correct qty if it is mistake, if you really have more qty than 200, set qty 200, and after that send mail to IT in order to correct qty in the database.';
+			return view('whsu.add_qty', compact('line', 'bag', 'bag_type', 'pro', 'sap_sku','app','msg'));
+		}
 
 		$status = "AUDIT_TO_DO";
 		$user = User::find(Auth::id())->name;
@@ -255,10 +264,10 @@ class whsuController extends Controller {
 			$table->bag = $bag;
 			$table->pro = $pro;
 			$table->approval = $app;
-			$table->style = $style;
-			$table->color = $color;
-			$table->size = $size;
-			$table->sap_sku = $sap_sku;
+			$table->style = trim($style);
+			$table->color = trim($color);
+			$table->size = trim($size);
+			$table->sap_sku = trim($sap_sku);
 
 			$table->bag_type = $bag_type;
 			$table->line = $line;

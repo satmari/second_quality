@@ -250,7 +250,7 @@ class AuditController extends Controller {
 		$input = $request->all(); // change use (delete or comment user Requestl; )
 		// dd($input);
 		$bag_id = (int)$input['id'];
-		$bag = $input['bag'];
+		$bag = strtoupper($input['bag']);
 
 		return view('audit.cancel_bag', compact('bag_id', 'bag'));
 	}
@@ -276,7 +276,7 @@ class AuditController extends Controller {
 		$input = $request->all(); // change use (delete or comment user Requestl; )
 		// dd($input);
 		$bag_id = (int)$input['id'];
-		$bag = $input['bag'];
+		$bag = strtoupper($input['bag']);
 
 		return view('audit.change_bag_po', compact('bag_id', 'bag'));
 	}
@@ -352,10 +352,10 @@ class AuditController extends Controller {
 		// $box->status = '';
 		$box->pro = $pro;
 		$box->approval = $app;
-		$box->style = $style;
-		$box->color = $color;
-		$box->size = $size;
-		$box->sap_sku = $sap_sku;
+		$box->style = trim($style);
+		$box->color = trim($color);
+		$box->size = trim($size);
+		$box->sap_sku = trim($sap_sku);
 		// $box->status = '';
 		$box->save();
 
@@ -377,5 +377,33 @@ class AuditController extends Controller {
 		// dd($data);
 
 		return view('audit.table', compact('data'));
+	}
+
+	public function change_bag_status(Request $request) {
+		
+		return view('audit.change_bag_status');
+	}
+
+	public function change_bag_status_post(Request $request) {
+		
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+
+		$bag = strtoupper($input['bag']);
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM second_quality_bags WHERE bag = '".$bag."' AND status = 'AUDIT_CHECKED' ORDER BY id asc"));
+
+		if (isset($data[0]->id)) {
+			
+			$box = second_quality_bag::findOrFail($data[0]->id);
+			$box->status = 'AUDIT_TO_DO';
+			$box->save();
+
+			$msg2 = 'Status succesfuly changed';
+			return view('audit.change_bag_status', compact('msg2'));
+
+		} else {
+			$msg = 'Bag not found or bag doesent have status AUDIT_CHECKED';
+			return view('audit.change_bag_status', compact('msg'));
+		}
 	}
 }

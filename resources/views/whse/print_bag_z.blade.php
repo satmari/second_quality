@@ -6,7 +6,7 @@
     <div class="row vertical-center-row">
         <div class="text-center col-md-2 col-md-offset-5">
             <div class="panel panel-default">
-				<div class="panel-heading">Print Bag barcode for Subotica</div>
+				<div class="panel-heading">Print Bag barcode for Senta</div>
 				<!-- <br> -->
 					
 					
@@ -17,16 +17,12 @@
 
 					</div>
 
-					{!! Form::open(['method'=>'POST', 'url'=>'/print_bag_su_confirm']) !!}
+					{!! Form::open(['method'=>'POST', 'url'=>'/print_bag_z_confirm']) !!}
 						<input name="_token" type="hidden" value="{!! csrf_token() !!}" />
-							<p>Label: </p>
-						<div class="panel-body">
-							{!! Form::select('labels', array('BS'=>'BS','BL'=>'BL','BK'=>'BK','BZ'=>'BZ','BOX'=>'BOX'), null, array('class' => 'form-control')); !!} 
-						</div>
-
+						
 						<div class="panel-body">
 							<p>Printer:</p>
-							{!! Form::select('printer_name', array(''=>'','Preparacija Zebra'=>'Preparacija Zebra','Magacin'=>'Magacin','Druga klasa ZEBRA' => 'Druga klasa ZEBRA'), null, array('class' => 'form-control')); !!} 
+							{!! Form::select('printer_name', array('Senta'=>'Senta'), null, array('class' => 'form-control')); !!} 
 						</div>
 
 						<div class="panel-body">

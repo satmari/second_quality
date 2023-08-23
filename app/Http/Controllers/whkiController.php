@@ -50,7 +50,7 @@ class whkiController extends Controller {
 		// $this->validate($request, ['line'=>'required']);
 		$input = $request->all(); // change use (delete or comment user Requestl; )
 		// dd($input);
-		$line = $input['line'];
+		$line = strtoupper($input['line']);
 		// dd($line);
 
 		$line_val = DB::connection('sqlsrv2')->select(DB::raw("SELECT [ModNam] as line FROM [172.27.161.221\\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_Modules] WHERE Active = '1' AND ModNam =  '".$line."' "));
@@ -178,6 +178,7 @@ class whkiController extends Controller {
 		$size = str_pad($size, 5);
 		$style = str_pad($st_info[0]->StyCod, 9);
 		$sap_sku = $style.$color.$size;
+
 		// dd($sap_sku);
 
 		$app = $st_info[0]->app;
@@ -198,6 +199,12 @@ class whkiController extends Controller {
 		$sap_sku = $input['sap_sku'];
 		$app = $input['app'];
 		$qty = (int)$input['qty'];
+
+		if ($qty > 200) {
+
+			$msg = 'Qty is greater than 200 pcs in the bag, please add the correct qty if it is mistake, if you really have more qty than 200, set qty 200, and after that send mail to IT in order to correct qty in the database.';
+			return view('whki.add_qty', compact('line', 'line_shift', 'bag', 'bag_type', 'pro', 'sap_sku','app','msg'));
+		}
 
 		$status = "PICKED_IN_KI";
 		$user = User::find(Auth::id())->name;
@@ -228,10 +235,10 @@ class whkiController extends Controller {
 			$table->bag = $bag;
 			$table->pro = $pro;
 			$table->approval = $app;
-			$table->style = $style;
-			$table->color = $color;
-			$table->size = $size;
-			$table->sap_sku = $sap_sku;
+			$table->style = trim($style);
+			$table->color = trim($color);
+			$table->size = trim($size);
+			$table->sap_sku = trim($sap_sku);
 
 			$table->bag_type = $bag_type;
 			$table->line = $line;

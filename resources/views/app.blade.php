@@ -19,7 +19,7 @@
 	<link href="{{ asset('/css/jquery-ui.min.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/custom.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/choosen.css') }}" rel='stylesheet' type='text/css'>
-	
+	<link rel="manifest" href="{{ asset('/css/manifest.json') }}">
 		
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -84,6 +84,9 @@
 						@if(Auth::user()->name == 'whki')
 							<li><a href="{{ url('/print_bag_ki') }}">Print bag barcodes</a></li> 
 						@endif
+						@if(Auth::user()->name == 'whse')
+							<li><a href="{{ url('/print_bag_z') }}">Print bag barcodes</a></li> 
+						@endif
 					@endif
 
 					@if(Auth::check() && Auth::user()->level() == 2)
@@ -109,6 +112,7 @@
 									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 
 									<li><a href="{{ url('/transfer_to_subotica') }}">Transfer bag from Kik to Su</a></li>
+									
 										
 									</ul>
 								</li>
@@ -169,7 +173,9 @@
 										
 									</ul>
 								</li>
-								<!-- <li><a href="{{ url('/magacin_shipment') }}">Shipment table</a></li>  -->
+								<li><a href="{{ url('/recheck_table') }}">Re-check table (PO)</a></li> 
+								<li><a href="{{ url('/recheck_table_sku') }}">Re-check table (SKU in APP)</a></li> 
+								<li><a href="{{ url('/recheck_table_sku_sap') }}">Re-check table (SKU in SAP)</a></li> 
 		
 						@endif
 						@if(Auth::user()->name == 'audit')
@@ -182,6 +188,7 @@
 									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 
 									<li><a href="{{ url('/transfer_to_subotica') }}">Transfer bag from Kik to Su</a></li>
+									<li><a href="{{ url('/change_bag_status') }}">Change bag status</a></li>
 										
 									</ul>
 								</li>

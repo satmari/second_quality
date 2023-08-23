@@ -13,7 +13,7 @@ class Change extends Migration {
 	public function up()
 	{
 		//
-		Schema::table('second_quality_bags', function (Blueprint $table) {
+		Schema::table('second_quality_links', function (Blueprint $table) {
   //   		// $table->string('shift')->nullable();
 
   //   		$table->string('ean')->nullable();
@@ -35,6 +35,10 @@ class Change extends Migration {
 			// $table->dateTime('bag_exported_date')->nullable();
 
 			// $table->dateTime('bag_in_audit')->nullable();
+
+
+			// $table->string('bag_box_key')->nullable(); //new
+			// $table->string('bag_box_key')->unique()->change(); //new
 			
 		});
 

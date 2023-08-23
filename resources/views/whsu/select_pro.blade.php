@@ -37,7 +37,8 @@
 
 						<div class="panel-body">
 							<p>PRO/Komesa:</p>
-							{!! Form::text('proo', null, ['id' => 'po', 'class' => 'form-control', 'autofocus' => 'autofocus']) !!}
+							
+							{!! Form::number('proo', null,  ['id' => 'po','class' => 'form-control',  'autofocus' => 'autofocus']) !!}
 						</div>
 
 

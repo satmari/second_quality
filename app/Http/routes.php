@@ -37,6 +37,9 @@ Route::post('/scan_bag_location', 'MagacinController@scan_bag_location');
 Route::post('/scan_confirm_location', 'MagacinController@scan_confirm_location');
 
 Route::get('/table', 'MagacinController@table');
+Route::get('/recheck_table', 'MagacinController@recheck_table');
+Route::get('/recheck_table_sku', 'MagacinController@recheck_table_sku');
+Route::get('/recheck_table_sku_sap', 'MagacinController@recheck_table_sku_sap');
 Route::get('/table_by_pro', 'MagacinController@table_by_pro');
 Route::post('/table_by_pro_post', 'MagacinController@table_by_pro_post');
 Route::get('/table_box', 'MagacinController@table_box');
@@ -89,6 +92,8 @@ Route::post('close_shipment_confirm_delete', 'MagacinController@close_shipment_c
 Route::post('/edit_box2', 'MagacinController@edit_box2');
 Route::post('update_box2/{id}', 'MagacinController@update_box2');
 
+Route::get('update_umesa', 'MagacinController@update_umesa');
+
 // Audit
 Route::get('/audit', 'AuditController@index');
 Route::get('/audit_table', 'AuditController@audit_table');
@@ -106,6 +111,9 @@ Route::post('/cancel_confirm', 'AuditController@cancel_confirm');
 
 Route::post('/change_bag_po', 'AuditController@change_bag_po');
 Route::post('/change_bag_po_confirm', 'AuditController@change_bag_po_confirm');
+
+Route::get('/change_bag_status', 'AuditController@change_bag_status');
+Route::post('/change_bag_status_post', 'AuditController@change_bag_status_post');
 
 // Whsu
 Route::get('/whsu', 'whsuController@index');
@@ -147,6 +155,10 @@ Route::post('/choose_bag_type_z', 'whseController@choose_bag_type');
 Route::post('/select_pro_z', 'whseController@select_pro');
 Route::post('/confirm_z', 'whseController@confirm');
 
+Route::get('/print_bag_z', 'whseController@print_bag_z');
+Route::post('/print_bag_z_confirm', 'whseController@print_bag_z_confirm');
+Route::post('/print_bag_z_confirm_print', 'whseController@print_bag_z_confirm_print');
+
 // Print weigth
 Route::get('/print_weight_label', 'print_weightController@index');
 Route::post('printer_set', 'print_weightController@printer_set');
@@ -160,6 +172,7 @@ Route::post('import_post_second_q', 'second_q@import_post_second_q');
 // Import
 Route::get('import', 'importController@index');
 Route::post('postImport', 'importController@postImport');
+Route::post('postImportQty', 'importController@postImportQty');
 
 Route::any('getpodata', function() {
 		$term = Input::get('term');

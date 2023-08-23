@@ -1,0 +1,11 @@
+{ 
+
+  "name": "Second quality app", 
+
+  "short_name": "Second quality app", 
+
+  "start_url": "http://172.27.161.171/second_quality",
+
+  "display": "standalone"
+
+}
